@@ -46,7 +46,7 @@ async function fetchPrayerTimes() {
          `${prayerTimes.esha.short}` // Isha
       ];
 
-      const locationInfo = {
+      locationInfo = {
         location: response.data.tzname,
         name: response.data.name,
     };
