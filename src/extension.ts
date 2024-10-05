@@ -1,86 +1,113 @@
 import * as vscode from 'vscode';
 import axios from 'axios';
 
-const apiUrl = 'https://salat.habibur.com/api/?lat=23.7483066&lng=90.4323979&tzoffset=360&tzname=Asia/Dhaka';
+const apiUrl = 'https://salat.habibur.com/api/?lat=24.0298&lng=90.7061&tzoffset=360&tzname=Asia/Dhaka';
 
 let prayerTimesStatusBar: vscode.StatusBarItem;
 let prayerAlarmTimeouts: NodeJS.Timeout[] = [];
+let allPrayerTimes: { short: string; secs: number }[] = []; // To store all prayer times
 
 export function activate(context: vscode.ExtensionContext) {
-   // Register the command
-   const disposable = vscode.commands.registerCommand('prayer-timer-bangladesh.showPrayerTimes', async () => {
-      try {
-         const response = await axios.get(apiUrl);
-         const prayerTimes = response.data.data;
+    // Register the command to show prayer times
+    const showPrayerTimesCommand = vscode.commands.registerCommand('prayer-timer-bangladesh.showPrayerTimes', async () => {
+        await fetchPrayerTimes();
+    });
 
-         const prayerNames = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-         const times = [
-            prayerTimes.fajar18.short,
-            prayerTimes.noon.short,
-            prayerTimes.asar1.short,
-            prayerTimes.magrib12.short,
-            prayerTimes.esha.short
-         ];
+    // Register the command to show all prayer times
+    const showAllPrayerTimesCommand = vscode.commands.registerCommand('prayer-timer-bangladesh.showAllPrayerTimes', () => {
+        showAllPrayerTimes();
+    });
 
-         // Display the prayer times in the status bar
-         updatePrayerTimesStatusBar(prayerNames, times);
+    context.subscriptions.push(showPrayerTimesCommand);
+    context.subscriptions.push(showAllPrayerTimesCommand);
 
-         // Set alarms for the prayer times
-         setPrayerAlarms(times);
-      } catch (error) {
-         vscode.window.showErrorMessage(`Failed to fetch prayer times: ${error}`);
-      }
-   });
+    // Initialize status bar
+    prayerTimesStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+    context.subscriptions.push(prayerTimesStatusBar);
 
-   context.subscriptions.push(disposable);
-
-   // Initialize status bar
-   prayerTimesStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
-   context.subscriptions.push(prayerTimesStatusBar);
-
-   // Automatically load prayer times on startup
-   vscode.commands.executeCommand('prayer-timer-bangladesh.showPrayerTimes');
+    // Automatically load prayer times on startup
+    vscode.commands.executeCommand('prayer-timer-bangladesh.showPrayerTimes');
 }
 
-function updatePrayerTimesStatusBar(prayerNames: string[], times: string[]) {
-   let displayText = 'Prayer Times: ';
-   for (let i = 0; i < prayerNames.length; i++) {
-      displayText += `${prayerNames[i]}: ${times[i]} `;
-   }
+async function fetchPrayerTimes() {
+    try {
+        const response = await axios.get(apiUrl);
+        const prayerTimes = response.data.data;
 
-   prayerTimesStatusBar.text = displayText;
-   prayerTimesStatusBar.show();
+        const prayerNames = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+        allPrayerTimes = [
+            { short: prayerTimes.fajar18.short, secs: prayerTimes.fajar18.secs },
+            { short: prayerTimes.noon.short, secs: prayerTimes.noon.secs },
+            { short: prayerTimes.asar1.short, secs: prayerTimes.asar1.secs },
+            { short: prayerTimes.magrib12.short, secs: prayerTimes.magrib12.secs },
+            { short: prayerTimes.esha.short, secs: prayerTimes.esha.secs },
+        ];
+
+        // Display only the current prayer time in the status bar
+        const currentPrayer = getCurrentPrayer(prayerNames, allPrayerTimes);
+        if (currentPrayer) {
+            updatePrayerTimesStatusBar(currentPrayer.name, currentPrayer.time);
+        }
+
+        // Set alarms for the prayer times
+        setPrayerAlarms(allPrayerTimes);
+    } catch (error) {
+        vscode.window.showErrorMessage(`Failed to fetch prayer times: ${error}`);
+    }
 }
 
-function setPrayerAlarms(times: string[]) {
-   // Clear previous alarms
-   prayerAlarmTimeouts.forEach(timeout => clearTimeout(timeout));
-   prayerAlarmTimeouts = [];
+function showAllPrayerTimes() {
+    const message = allPrayerTimes.map(p => p.short).join('\n'); // Join all prayer times with a newline for display
+    vscode.window.showInformationMessage(`Prayer Times:\n${message}`, { modal: true }); // Show all times in an information message
+}
 
-   const currentTime = new Date();
-   const currentHour = currentTime.getHours();
-   const currentMinutes = currentTime.getMinutes();
+function getCurrentPrayer(prayerNames: string[], prayerTimes: { short: string; secs: number }[]) {
+    const currentTimeInSecs = Math.floor(new Date().getTime() / 1000); // Current time in seconds
 
-   for (let time of times) {
-      const [hour, minute] = time.split(':').map(Number);
+    // Loop through the prayer times and find the next one
+    for (let i = 0; i < prayerTimes.length; i++) {
+        const prayerTimeInSecs = prayerTimes[i].secs; // Get the prayer time in seconds
 
-      if (hour > currentHour || (hour === currentHour && minute > currentMinutes)) {
-         const alarmTime = new Date();
-         alarmTime.setHours(hour);
-         alarmTime.setMinutes(minute);
+        // Check if the current time is before the next prayer time
+        if (prayerTimeInSecs > currentTimeInSecs) {
+            return { name: prayerNames[i], time: prayerTimes[i].short };
+        }
+    }
 
-         const timeUntilAlarm = alarmTime.getTime() - currentTime.getTime();
+    // If no prayer is upcoming, return the last prayer
+    return { name: prayerNames[prayerNames.length - 1], time: prayerTimes[prayerTimes.length - 1].short };
+}
 
-         const timeout = setTimeout(() => {
-            vscode.window.showInformationMessage(`It's time for prayer! (${time})`);
-         }, timeUntilAlarm);
+function updatePrayerTimesStatusBar(prayerName: string, prayerTime: string) {
+    prayerTimesStatusBar.text = `${prayerName}: ${prayerTime}`;
+    prayerTimesStatusBar.tooltip = 'Click to see all prayer times';
+    prayerTimesStatusBar.command = 'prayer-timer-bangladesh.showAllPrayerTimes'; // Link the command to the status bar item
+    prayerTimesStatusBar.show();
+}
 
-         prayerAlarmTimeouts.push(timeout);
-      }
-   }
+function setPrayerAlarms(prayerTimes: { short: string; secs: number }[]) {
+    // Clear previous alarms
+    prayerAlarmTimeouts.forEach(timeout => clearTimeout(timeout));
+    prayerAlarmTimeouts = [];
+
+    const currentTimeInSecs = Math.floor(new Date().getTime() / 1000);
+
+    for (let prayer of prayerTimes) {
+        const prayerTimeInSecs = prayer.secs;
+
+        if (prayerTimeInSecs > currentTimeInSecs) {
+            const timeUntilAlarm = prayerTimeInSecs - currentTimeInSecs;
+
+            const timeout = setTimeout(() => {
+                vscode.window.showInformationMessage(`It's time for prayer! (${prayer.short})`);
+            }, timeUntilAlarm * 1000); // Convert seconds to milliseconds
+
+            prayerAlarmTimeouts.push(timeout);
+        }
+    }
 }
 
 export function deactivate() {
-   prayerTimesStatusBar.hide();
-   prayerAlarmTimeouts.forEach(timeout => clearTimeout(timeout));
+    prayerTimesStatusBar.hide();
+    prayerAlarmTimeouts.forEach(timeout => clearTimeout(timeout));
 }
