@@ -1,32 +1,36 @@
-
 # Change Log
 
-All notable changes to the **Prayer timer bangladesh** extension will be documented in this file.
+All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visualstudio.com/items?itemName=azmolla.prayer-timer-bangladesh)** extension will be documented here.
 
-Check [Keep a Changelog](http://abir.bornback.top/) for recommendations on how to structure this file.
+## [0.2.4] - 2024-10-05
+
+### Added
+- Update Documentation
+- Update Changelog
+- Add Homepage Link
 
 ## [0.2.3] - 2024-10-05
 
 ### Added
-- Added Icon for the extension.
+- Icon for the extension.
 
 ## [0.2.2] - 2024-10-05
 
 ### Added
 - Support for configuring GPS coordinates with default values for latitude and longitude.
-- Support for setting the timezone name as `Asia/Dhaka`.
-- Added options to customize the position of the time display in the status bar (`left` or `right`).
-- Included an option to toggle visibility of prayer times in the status bar.
+- Timezone setting defaulted to `Asia/Dhaka`.
+- Option to customize the position of the time display in the status bar (`left` or `right`).
+- Option to toggle the visibility of prayer times in the status bar.
 
 ### Fixed
-- Ensured proper initialization of commands upon startup.
-- Corrected the display of prayer times based on current GPS coordinates.
+- Proper initialization of commands upon startup.
+- Corrected prayer time display based on GPS coordinates.
 
 ## [0.1.0] - 2024-10-05
 
 ### Added
 - Basic framework for the extension.
-- Setup of necessary configuration files and dependencies.
+- Setup of configuration files and dependencies.
 - Preliminary testing for functionality.
 
 ## [Beta]
@@ -34,10 +38,9 @@ Check [Keep a Changelog](http://abir.bornback.top/) for recommendations on how t
 ### Added
 - Initial release of the Prayer Timer Bangladesh extension.
 - Feature to display prayer times based on GPS location.
-- Command to display current prayer times.
-- Command to show all prayer times.
+- Commands to display current prayer times and show all prayer times.
 - Configuration options for latitude, longitude, timezone, display position, and visibility in the status bar.
 
 ---
 
-Feel free to add more details or future changes as they occur. This format allows users to track the evolution of your extension easily.
+For more details on changes, visit the [GitHub repository](https://github.com/abiruzzamanmolla/prayer-timer-bangladesh).
