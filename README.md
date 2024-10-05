@@ -1,6 +1,3 @@
-Here’s a detailed documentation draft for your Visual Studio Code extension, **Prayer Timer Bangladesh**. This document covers various aspects including installation, usage, configuration, and additional information relevant to users and contributors.
-
----
 
 # Prayer Timer Bangladesh Documentation
 

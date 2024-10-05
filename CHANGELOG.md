@@ -1,18 +1,14 @@
 
 # Change Log
 
-All notable changes to the **prayer-timer-bangladesh** extension will be documented in this file.
+All notable changes to the **Prayer timer bangladesh** extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+Check [Keep a Changelog](http://abir.bornback.top/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [0.2.3] - 2024-10-05
 
 ### Added
-- Initial release of the Prayer Timer Bangladesh extension.
-- Feature to display prayer times based on GPS location.
-- Command to display current prayer times.
-- Command to show all prayer times.
-- Configuration options for latitude, longitude, timezone, display position, and visibility in the status bar.
+- Added Icon for the extension.
 
 ## [0.2.2] - 2024-10-05
 
@@ -26,12 +22,21 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 - Ensured proper initialization of commands upon startup.
 - Corrected the display of prayer times based on current GPS coordinates.
 
-## [0.1.0] - 2024-09-25
+## [0.1.0] - 2024-10-05
 
 ### Added
 - Basic framework for the extension.
 - Setup of necessary configuration files and dependencies.
 - Preliminary testing for functionality.
+
+## [Beta]
+
+### Added
+- Initial release of the Prayer Timer Bangladesh extension.
+- Feature to display prayer times based on GPS location.
+- Command to display current prayer times.
+- Command to show all prayer times.
+- Configuration options for latitude, longitude, timezone, display position, and visibility in the status bar.
 
 ---
 
