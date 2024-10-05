@@ -24,6 +24,10 @@
 
   ![Prayer Timer Bangladesh Icon](./screenshots/timer-in-status-bar.png)
 
+- **Show All Prayer Times**: By Clicking on the status bar item, you can see all prayer times in a list.
+
+  ![Prayer Timer Bangladesh Icon](./screenshots/show-all-times.png)
+
 ## Installation
 
 1. **Install via Marketplace**:
