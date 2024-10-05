@@ -2,7 +2,7 @@
   "name": "prayer-timer-bangladesh",
   "displayName": "Prayer Timer Bangladesh",
   "description": "An extension to show prayer times based on GPS location in Bangladesh.",
-  "version": "0.1.3",
+  "version": "0.2.2",
   "engines": {
     "vscode": "^1.94.0"
   },
@@ -24,7 +24,39 @@
         "command": "prayer-timer-bangladesh.showAllPrayerTimes",
         "title": "Show All Prayer Times"
       }
-    ]
+    ],
+  "configuration": {
+          "type": "object",
+          "title": "Prayer Timer Bangladesh Settings",
+          "properties": {
+              "prayerTimerBangladesh.lat": {
+                  "type": "number",
+                  "default": 24.0298,
+                  "description": "Latitude for prayer times."
+              },
+              "prayerTimerBangladesh.lng": {
+                  "type": "number",
+                  "default": 90.7061,
+                  "description": "Longitude for prayer times."
+              },
+              "prayerTimerBangladesh.tzname": {
+                  "type": "string",
+                  "default": "Asia/Dhaka",
+                  "description": "Timezone name for prayer times."
+              },
+              "prayerTimerBangladesh.position": {
+                  "type": "string",
+                  "enum": ["left", "right"],
+                  "default": "right",
+                  "description": "Position of the time display in the status bar."
+              },
+              "prayerTimerBangladesh.active": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Whether to show the prayer time in the status bar."
+              }
+          }
+      }
   },
   "repository": {
     "type": "git",
