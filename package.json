@@ -2,7 +2,7 @@
   "name": "prayer-timer-bangladesh",
   "displayName": "Prayer Timer Bangladesh",
   "description": "An extension to show prayer times based on GPS location in Bangladesh.",
-  "version": "0.0.2",
+  "version": "0.1.3",
   "engines": {
     "vscode": "^1.94.0"
   },
