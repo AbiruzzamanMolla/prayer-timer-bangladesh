@@ -12,13 +12,16 @@
   - Set the timezone (default: `Asia/Dhaka`).
   - Choose the position of prayer times in the status bar (`left` or `right`).
   - Toggle visibility of prayer times in the status bar.
+
   ![Prayer Timer Bangladesh Icon](./screenshots/seetings.png)
 - **Commands**:
   - `Display Prayer Times`: Shows current prayer time in the status bar.
   - `Show All Prayer Times`: Displays all prayer times in a list.
+
   ![Prayer Timer Bangladesh Icon](./screenshots/commands.png)
   
 - **Status Bar Integration**: Seamlessly displays the current prayer time in the status bar without disrupting your workflow.
+
   ![Prayer Timer Bangladesh Icon](./screenshots/timer-in-status-bar.png)
 
 ## Installation
@@ -27,6 +30,7 @@
    - Open Visual Studio Code.
    - Go to the Extensions view by clicking on the Extensions icon in the Activity Bar.
    - Search for **Prayer Timer Bangladesh** and click **Install**.
+
    ![Prayer Timer Bangladesh Icon](./screenshots/search-in-marketplace.png)
 
    Or visit the extension [on the Marketplace](https://marketplace.visualstudio.com/items?itemName=azmolla.prayer-timer-bangladesh).
