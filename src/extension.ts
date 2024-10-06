@@ -158,6 +158,7 @@ function showAllPrayerTimes() {
 function getCurrentPrayer(prayerNames: string[], times: string[]) {
   const currentTime = new Date();
   const currentSecs = Math.floor(currentTime.getTime() / 1000); // Get current time in seconds
+  const midnightSecs = getMidnightSecs(); // Get midnight time in seconds
 
   for (let i = 0; i < times.length; i++) {
     const prayerTimeSecs = getPrayerTimeSecs(i);
@@ -178,28 +179,44 @@ function getCurrentPrayer(prayerNames: string[], times: string[]) {
   // Handle the case where the last prayer is over
   const lastPrayerTimeSecs = getPrayerTimeSecs(times.length - 1);
   if (currentSecs > lastPrayerTimeSecs) {
-    const sehriTimeSecs = prayerTimes.sehri.secs;
-    if (currentSecs < sehriTimeSecs) {
-      // Show time left until Sehri if current time is before Sehri
-      const remainingTime = sehriTimeSecs - currentSecs;
+    // Isha time is over, check for Tahajjud
+    if (currentSecs < midnightSecs) {
+      const remainingTime = midnightSecs - currentSecs;
       const hours = Math.floor(remainingTime / 3600);
       const minutes = Math.floor((remainingTime % 3600) / 60);
       return {
         name: "Isha",
-        time: times[times.length - 1], // Last prayer time
-        remainingTime: `${hours}h ${minutes}m until Sehri`,
+        time: times[times.length - 1],
+        remainingTime: `${hours}h ${minutes}m until midnight`,
       };
     } else {
-      // If past Sehri, return that no prayer is left
+      // Past midnight, show time until Fajr
+      const nextFajrTimeSecs = prayerTimes.fajar18.secs; // Assuming Fajr is the next prayer
+      const remainingTime = nextFajrTimeSecs + 86400 - currentSecs; // Add 24 hours for next day's Fajr
+      const hours = Math.floor(remainingTime / 3600);
+      const minutes = Math.floor((remainingTime % 3600) / 60);
       return {
-        name: prayerNames[prayerNames.length - 1],
+        name: "Tahajjud",
         time: times[times.length - 1],
-        remainingTime: "No more prayer times today.",
+        remainingTime: `${hours}h ${minutes}m until Fajr`,
       };
     }
   }
+
+  return {
+    name: prayerNames[prayerNames.length - 1],
+    time: times[times.length - 1],
+    remainingTime: "Pray Isha and Tahajjud",
+  };
 }
 
+function getMidnightSecs() {
+  const now = new Date();
+  return Math.floor(
+    new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() /
+      1000
+  );
+}
 
 function getPrayerTimeSecs(index: number) {
   switch (index) {

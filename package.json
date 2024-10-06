@@ -1,9 +1,9 @@
 {
   "name": "prayer-timer-bangladesh",
   "displayName": "Prayer Timer Bangladesh",
-  "description": "The Prayer Timer Bangladesh extension provides an easy and convenient way to track prayer times based on your GPS location within Bangladesh. With this extension, you can seamlessly integrate prayer time notifications into your Visual Studio Code environment. \n\n### Key Features:\n- **Dynamic GPS-Based Prayer Times**: Automatically retrieves prayer times based on your current latitude and longitude, ensuring accurate timings for your location.\n- **Customizable Settings**: Configure your preferred latitude, longitude, and timezone name directly in the settings.\n- **Status Bar Integration**: Displays the current prayer time directly in the status bar, allowing you to keep track without disrupting your workflow.\n- **Command Options**: Easily access commands to display current prayer times or show all prayer times with simple keyboard shortcuts or command palette options.\n- **User-Friendly Interface**: Simple configuration options for adjusting the display position (left or right) and toggling the visibility of prayer times.\n\n### Configuration Options:\n- **Latitude and Longitude**: Set default values for your geographic location (default: 24.0298, 90.7061).\n- **Timezone**: Automatically adjusts to your local timezone (default: Asia/Dhaka).\n- **Display Position**: Choose to display prayer times on the left or right side of the status bar (default: right).\n- **Active Status**: Toggle the display of prayer times in the status bar on or off.\n\nThis extension is designed for users who wish to maintain their prayer schedules while working in Visual Studio Code, offering a streamlined way to stay connected with their spiritual practices.",
-  "version": "0.3.5",
-  "preview": false,
+  "description": "The Prayer Timer Bangladesh extension provides an easy and convenient way to track prayer times based on your GPS location within Bangladesh. With this extension, you can seamlessly integrate prayer time notifications into your Visual Studio Code environment.",
+  "version": "0.4.202420063",
+  "preview": true,
   "publisher": "azmolla",
   "icon": "icon.png",
   "engines": {
