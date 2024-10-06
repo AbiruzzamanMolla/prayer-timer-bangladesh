@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
 import axios from "axios";
+import * as fs from "fs";
+import * as path from "path";
 
 // Default configuration keys
 const CONFIG_KEY_LAT = "prayerTimerBangladesh.lat";
@@ -13,9 +15,11 @@ let prayerAlarmTimeouts: NodeJS.Timeout[] = [];
 let allPrayerTimes: string[] = []; // To store all prayer times
 let prayerTimes: any; // To store all prayer data
 let locationInfo: any; // To store all prayer data
+let hadiths: any[] = []; // To store hadiths
 
 export function activate(context: vscode.ExtensionContext) {
-  // Register the command to show prayer times
+  loadHadiths(); // Load hadiths on activation
+
   const showPrayerTimesCommand = vscode.commands.registerCommand(
     "prayer-timer-bangladesh.showPrayerTimes",
     async () => {
@@ -23,7 +27,6 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // Register the command to show all prayer times
   const showAllPrayerTimesCommand = vscode.commands.registerCommand(
     "prayer-timer-bangladesh.showAllPrayerTimes",
     () => {
@@ -34,7 +37,6 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(showPrayerTimesCommand);
   context.subscriptions.push(showAllPrayerTimesCommand);
 
-  // Initialize status bar with alignment based on user preference
   const position = vscode.workspace
     .getConfiguration()
     .get<string>(CONFIG_KEY_POSITION);
@@ -46,34 +48,31 @@ export function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(prayerTimesStatusBar);
 
-  // Automatically load prayer times on startup
   vscode.commands.executeCommand("prayer-timer-bangladesh.showPrayerTimes");
 }
 
 async function fetchPrayerTimes() {
   try {
-    // Fetch settings from configuration
     const lat = vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_LAT);
     const lng = vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_LNG);
     const tzname = vscode.workspace
       .getConfiguration()
       .get<string>(CONFIG_KEY_TZNAME);
 
-    // Build API URL using settings
     const apiUrl = `https://salat.habibur.com/api/?lat=${lat}&lng=${lng}&tzoffset=360&tzname=${tzname}`;
 
     const response = await axios.get(apiUrl);
-    prayerTimes = response.data.data; // Store all prayer times data
+    prayerTimes = response.data.data;
 
     const prayerNames = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
 
     allPrayerTimes = [
-      `${prayerTimes.fajar18.short}`, // Fajr
-      `${prayerTimes.noon.short}`, // Dhuhr
-      `${prayerTimes.asar1.short}`, // Asar start
-      `${prayerTimes.asar2.short}`, // Asar end
-      `${prayerTimes.magrib12.short}`, // Maghrib
-      `${prayerTimes.esha.short}`, // Isha
+      `${prayerTimes.fajar18.short}`,
+      `${prayerTimes.noon.short}`,
+      `${prayerTimes.asar1.short}`,
+      `${prayerTimes.asar2.short}`,
+      `${prayerTimes.magrib12.short}`,
+      `${prayerTimes.esha.short}`,
     ];
 
     locationInfo = {
@@ -81,12 +80,10 @@ async function fetchPrayerTimes() {
       name: response.data.name,
     };
 
-    // Check if the display is active
     const isActive = vscode.workspace
       .getConfiguration()
       .get<boolean>(CONFIG_KEY_ACTIVE);
     if (isActive) {
-      // Display the active prayer and remaining time in the status bar
       const currentPrayer = getCurrentPrayer(prayerNames, allPrayerTimes);
       if (currentPrayer) {
         updatePrayerTimesStatusBar(
@@ -94,9 +91,17 @@ async function fetchPrayerTimes() {
           currentPrayer.time,
           currentPrayer.remainingTime
         );
+
+        // Show hadith notification 5 minutes before the current prayer time
+        const currentTime = new Date();
+        const prayerTimeDate = new Date(currentPrayer.time); // Convert prayer time string to Date
+        const timeDiff = prayerTimeDate.getTime() - currentTime.getTime();
+        if (timeDiff <= 5 * 60 * 1000) {
+          // 5 minutes in milliseconds
+          showHadithNotification();
+        }
       }
 
-      // Set alarms for the prayer times
       setPrayerAlarms(allPrayerTimes);
     } else {
       prayerTimesStatusBar.hide(); // Hide if not active
@@ -104,6 +109,29 @@ async function fetchPrayerTimes() {
   } catch (error) {
     vscode.window.showErrorMessage(`Failed to fetch prayer times: ${error}`);
   }
+}
+
+function loadHadiths() {
+  const hadithFilePath = path.join(__dirname, "hadith.json");
+  fs.readFile(hadithFilePath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Error loading hadiths:", err);
+      return;
+    }
+    try {
+      hadiths = JSON.parse(data);
+    } catch (error) {
+      console.error("Error parsing hadiths:", error);
+    }
+  });
+}
+
+function showHadithNotification() {
+  const randomIndex = Math.floor(Math.random() * hadiths.length);
+  const hadith = hadiths[randomIndex];
+  vscode.window.showInformationMessage(
+    `${hadith.hadith} - ${hadith.reference}`
+  );
 }
 
 function showAllPrayerTimes() {
@@ -124,17 +152,16 @@ function showAllPrayerTimes() {
     `;
   vscode.window.showInformationMessage(`Prayer Times:\n${message}`, {
     modal: true,
-  }); // Show all times in an information message
+  });
 }
 
 function getCurrentPrayer(prayerNames: string[], times: string[]) {
   const currentTime = new Date();
-  const currentSecs = Math.floor(currentTime.getTime() / 1000); // Get current time in seconds
+  const currentSecs = Math.floor(currentTime.getTime() / 1000);
 
   for (let i = 0; i < times.length; i++) {
     const prayerTimeSecs = getPrayerTimeSecs(i);
 
-    // Check if the current time is before the next prayer time
     if (prayerTimeSecs > currentSecs) {
       const remainingTime = prayerTimeSecs - currentSecs;
       const hours = Math.floor(remainingTime / 3600);
@@ -147,14 +174,12 @@ function getCurrentPrayer(prayerNames: string[], times: string[]) {
     }
   }
 
-  // If no prayer is upcoming, return the last prayer
   return {
     name: prayerNames[prayerNames.length - 1],
     time: times[times.length - 1],
     remainingTime: "Prayer time is over.",
   };
 }
-
 
 function getPrayerTimeSecs(index: number) {
   switch (index) {
@@ -171,14 +196,8 @@ function getPrayerTimeSecs(index: number) {
     case 5:
       return prayerTimes.esha.secs; // Isha
     default:
-      return 0; // Default case
+      return 0;
   }
-}
-
-function formatRemainingTime(seconds: number) {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  return `${hours > 0 ? hours + "h " : ""}${minutes}m`;
 }
 
 function updatePrayerTimesStatusBar(
@@ -188,28 +207,27 @@ function updatePrayerTimesStatusBar(
 ) {
   prayerTimesStatusBar.text = `Prayer Time: ${prayerName} (${remainingTime} left)`;
   prayerTimesStatusBar.tooltip = "Click to see all prayer times";
-  prayerTimesStatusBar.command = "prayer-timer-bangladesh.showAllPrayerTimes"; // Link the command to the status bar item
+  prayerTimesStatusBar.command = "prayer-timer-bangladesh.showAllPrayerTimes";
 
   prayerTimesStatusBar.show();
 }
 
 function setPrayerAlarms(times: string[]) {
-  // Clear previous alarms
   prayerAlarmTimeouts.forEach((timeout) => clearTimeout(timeout));
   prayerAlarmTimeouts = [];
 
   const currentTime = new Date();
-  const currentSecs = Math.floor(currentTime.getTime() / 1000); // Get current time in seconds
+  const currentSecs = Math.floor(currentTime.getTime() / 1000);
 
   for (let time of times) {
-    const prayerTimeSecs = getPrayerTimeSecs(times.indexOf(time)); // Get seconds for the prayer time
+    const prayerTimeSecs = getPrayerTimeSecs(times.indexOf(time));
 
     if (prayerTimeSecs > currentSecs) {
       const timeUntilAlarm = prayerTimeSecs - currentSecs;
 
       const timeout = setTimeout(() => {
         vscode.window.showInformationMessage(`It's time for prayer! (${time})`);
-      }, timeUntilAlarm * 1000); // Convert seconds to milliseconds
+      }, timeUntilAlarm * 1000);
 
       prayerAlarmTimeouts.push(timeout);
     }

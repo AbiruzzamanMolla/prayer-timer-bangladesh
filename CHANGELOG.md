@@ -2,6 +2,14 @@
 
 All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visualstudio.com/items?itemName=azmolla.prayer-timer-bangladesh)** extension will be documented here.
 
+### Changelog for Version 0.3.4
+- **New Feature**: Added a notification to display a random hadith related to prayer 5 minutes before each prayer time.
+- **Data Storage**: Introduced a `hadith.json` file to store hadiths and their references.
+- **Dependency Update**: Included the `fs` module for reading JSON files.
+- **Error Handling**: Added error handling for loading and parsing hadiths.
+- **Code Optimization**: Refactored relevant functions for better clarity and maintainability.
+
+
 ## [0.3.2] - 2024-10-06
 
 ### Fixed
