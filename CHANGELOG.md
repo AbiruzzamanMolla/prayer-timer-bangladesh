@@ -2,6 +2,23 @@
 
 All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visualstudio.com/items?itemName=azmolla.prayer-timer-bangladesh)** extension will be documented here.
 
+
+## [0.3.2] - 2024-10-06
+
+### Added
+- Enhanced the display format for currently active prayer time to show remaining time (e.g., `Prayer Time: Asr (2h 30m left)`).
+
+### Fixed
+- Corrected the behavior during the **prohibited time** between **Asr End** and **Maghrib**. Now the extension displays a message indicating that **prayer is prohibited** and the remaining time until **Maghrib** (e.g., `Prohibited Time: No prayer (Maghrib in 25m)`).
+
+### Improved
+- Optimized the logic for calculating and displaying the **currently active prayer time** and its remaining duration.
+
+## [0.3.1] - 2024-10-06
+
+### Added
+- Updated status bar to show the currently active prayer along with the remaining time until the next prayer.
+
 ## [0.2.4] - 2024-10-05
 
 ### Added
