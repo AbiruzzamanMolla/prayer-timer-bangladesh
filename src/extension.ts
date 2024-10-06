@@ -157,11 +157,12 @@ function showAllPrayerTimes() {
 
 function getCurrentPrayer(prayerNames: string[], times: string[]) {
   const currentTime = new Date();
-  const currentSecs = Math.floor(currentTime.getTime() / 1000);
+  const currentSecs = Math.floor(currentTime.getTime() / 1000); // Get current time in seconds
 
   for (let i = 0; i < times.length; i++) {
     const prayerTimeSecs = getPrayerTimeSecs(i);
 
+    // Check if the current time is before the next prayer time
     if (prayerTimeSecs > currentSecs) {
       const remainingTime = prayerTimeSecs - currentSecs;
       const hours = Math.floor(remainingTime / 3600);
@@ -174,12 +175,31 @@ function getCurrentPrayer(prayerNames: string[], times: string[]) {
     }
   }
 
-  return {
-    name: prayerNames[prayerNames.length - 1],
-    time: times[times.length - 1],
-    remainingTime: "Prayer time is over.",
-  };
+  // Handle the case where the last prayer is over
+  const lastPrayerTimeSecs = getPrayerTimeSecs(times.length - 1);
+  if (currentSecs > lastPrayerTimeSecs) {
+    const sehriTimeSecs = prayerTimes.sehri.secs;
+    if (currentSecs < sehriTimeSecs) {
+      // Show time left until Sehri if current time is before Sehri
+      const remainingTime = sehriTimeSecs - currentSecs;
+      const hours = Math.floor(remainingTime / 3600);
+      const minutes = Math.floor((remainingTime % 3600) / 60);
+      return {
+        name: "Isha",
+        time: times[times.length - 1], // Last prayer time
+        remainingTime: `${hours}h ${minutes}m until Sehri`,
+      };
+    } else {
+      // If past Sehri, return that no prayer is left
+      return {
+        name: prayerNames[prayerNames.length - 1],
+        time: times[times.length - 1],
+        remainingTime: "No more prayer times today.",
+      };
+    }
+  }
 }
+
 
 function getPrayerTimeSecs(index: number) {
   switch (index) {

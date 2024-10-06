@@ -2,6 +2,13 @@
 
 All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visualstudio.com/items?itemName=azmolla.prayer-timer-bangladesh)** extension will be documented here.
 
+## Changelog for Version 0.3.5
+
+- **Enhanced Status Bar Behavior**: Fixed the issue where the status bar incorrectly displayed that Isha time was over until Sehri. Now, it shows the time remaining until Sehri if it's after Isha.
+- **Improved Notification Logic**: Notifications for prayer times have been refined to provide accurate remaining time messages.
+- **Hadith Integration**: Added a feature to display hadith notifications 5 minutes before each prayer time, with hadiths stored in `hadith.json`.
+
+
 ### Changelog for Version 0.3.4
 - **New Feature**: Added a notification to display a random hadith related to prayer 5 minutes before each prayer time.
 - **Data Storage**: Introduced a `hadith.json` file to store hadiths and their references.
