@@ -2,15 +2,28 @@
   "name": "prayer-timer-bangladesh",
   "displayName": "Prayer Timer Bangladesh",
   "description": "The Prayer Timer Bangladesh extension provides an easy and convenient way to track prayer times based on your GPS location within Bangladesh. With this extension, you can seamlessly integrate prayer time notifications into your Visual Studio Code environment. \n\n### Key Features:\n- **Dynamic GPS-Based Prayer Times**: Automatically retrieves prayer times based on your current latitude and longitude, ensuring accurate timings for your location.\n- **Customizable Settings**: Configure your preferred latitude, longitude, and timezone name directly in the settings.\n- **Status Bar Integration**: Displays the current prayer time directly in the status bar, allowing you to keep track without disrupting your workflow.\n- **Command Options**: Easily access commands to display current prayer times or show all prayer times with simple keyboard shortcuts or command palette options.\n- **User-Friendly Interface**: Simple configuration options for adjusting the display position (left or right) and toggling the visibility of prayer times.\n\n### Configuration Options:\n- **Latitude and Longitude**: Set default values for your geographic location (default: 24.0298, 90.7061).\n- **Timezone**: Automatically adjusts to your local timezone (default: Asia/Dhaka).\n- **Display Position**: Choose to display prayer times on the left or right side of the status bar (default: right).\n- **Active Status**: Toggle the display of prayer times in the status bar on or off.\n\nThis extension is designed for users who wish to maintain their prayer schedules while working in Visual Studio Code, offering a streamlined way to stay connected with their spiritual practices.",
-  "version": "0.3.2",
+  "version": "0.3.3",
+  "preview": true,
   "publisher": "azmolla",
   "icon": "icon.png",
   "engines": {
     "vscode": "^1.94.0"
   },
+  "bugs": {
+    "url": "https://github.com/AbiruzzamanMolla/prayer-timer-bangladesh/issues"
+  },
   "homepage": "https://marketplace.visualstudio.com/items?itemName=azmolla.prayer-timer-bangladesh",
   "categories": [
     "Other"
+  ],
+  "keywords": [
+    "prayer",
+    "namaj",
+    "prayer-time",
+    "namaj-type",
+    "salah time",
+    "time",
+    "muslim"
   ],
   "activationEvents": [
     "onStartupFinished",
@@ -28,38 +41,41 @@
         "title": "Show All Prayer Times"
       }
     ],
-  "configuration": {
-          "type": "object",
-          "title": "Prayer Timer Bangladesh Settings",
-          "properties": {
-              "prayerTimerBangladesh.lat": {
-                  "type": "number",
-                  "default": 24.0298,
-                  "description": "Latitude for prayer times."
-              },
-              "prayerTimerBangladesh.lng": {
-                  "type": "number",
-                  "default": 90.7061,
-                  "description": "Longitude for prayer times."
-              },
-              "prayerTimerBangladesh.tzname": {
-                  "type": "string",
-                  "default": "Asia/Dhaka",
-                  "description": "Timezone name for prayer times."
-              },
-              "prayerTimerBangladesh.position": {
-                  "type": "string",
-                  "enum": ["left", "right"],
-                  "default": "right",
-                  "description": "Position of the time display in the status bar."
-              },
-              "prayerTimerBangladesh.active": {
-                  "type": "boolean",
-                  "default": true,
-                  "description": "Whether to show the prayer time in the status bar."
-              }
-          }
+    "configuration": {
+      "type": "object",
+      "title": "Prayer Timer Bangladesh Settings",
+      "properties": {
+        "prayerTimerBangladesh.lat": {
+          "type": "number",
+          "default": 24.0298,
+          "description": "Latitude for prayer times."
+        },
+        "prayerTimerBangladesh.lng": {
+          "type": "number",
+          "default": 90.7061,
+          "description": "Longitude for prayer times."
+        },
+        "prayerTimerBangladesh.tzname": {
+          "type": "string",
+          "default": "Asia/Dhaka",
+          "description": "Timezone name for prayer times."
+        },
+        "prayerTimerBangladesh.position": {
+          "type": "string",
+          "enum": [
+            "left",
+            "right"
+          ],
+          "default": "right",
+          "description": "Position of the time display in the status bar."
+        },
+        "prayerTimerBangladesh.active": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to show the prayer time in the status bar."
+        }
       }
+    }
   },
   "repository": {
     "type": "git",

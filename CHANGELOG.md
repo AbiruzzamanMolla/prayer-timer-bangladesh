@@ -2,6 +2,10 @@
 
 All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visualstudio.com/items?itemName=azmolla.prayer-timer-bangladesh)** extension will be documented here.
 
+## [0.3.2] - 2024-10-06
+
+### Fixed
+- Updated Version Number
 
 ## [0.3.2] - 2024-10-06
 
