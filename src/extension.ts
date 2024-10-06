@@ -133,45 +133,28 @@ function getCurrentPrayer(prayerNames: string[], times: string[]) {
 
   for (let i = 0; i < times.length; i++) {
     const prayerTimeSecs = getPrayerTimeSecs(i);
-    const nextPrayerTimeSecs =
-      i < times.length - 1 ? getPrayerTimeSecs(i + 1) : null;
 
-    if (
-      prayerTimeSecs <= currentSecs &&
-      nextPrayerTimeSecs &&
-      currentSecs < nextPrayerTimeSecs
-    ) {
-      // Check if it's the prohibited time between Asr End and Maghrib
-      if (
-        prayerNames[i] === "Asr" &&
-        currentSecs >= getPrayerTimeSecs(i + 1) &&
-        currentSecs < getPrayerTimeSecs(i + 2)
-      ) {
-        const remainingTime = formatRemainingTime(
-          getPrayerTimeSecs(i + 2) - currentSecs
-        );
-        return {
-          name: "Prohibited Time",
-          time: `No prayer (Maghrib in ${remainingTime})`,
-        };
-      }
-
-      const remainingTime = formatRemainingTime(
-        nextPrayerTimeSecs - currentSecs
-      );
+    // Check if the current time is before the next prayer time
+    if (prayerTimeSecs > currentSecs) {
+      const remainingTime = prayerTimeSecs - currentSecs;
+      const hours = Math.floor(remainingTime / 3600);
+      const minutes = Math.floor((remainingTime % 3600) / 60);
       return {
         name: prayerNames[i],
-        time: `${times[i]} (${remainingTime} left)`,
+        time: times[i],
+        remainingTime: `${hours}h ${minutes}m left`,
       };
     }
   }
 
-  // If no prayer is active, return the last prayer
+  // If no prayer is upcoming, return the last prayer
   return {
     name: prayerNames[prayerNames.length - 1],
-    time: `${times[times.length - 1]}`,
+    time: times[times.length - 1],
+    remainingTime: "Prayer time is over.",
   };
 }
+
 
 function getPrayerTimeSecs(index: number) {
   switch (index) {
