@@ -45,7 +45,6 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(showAllPrayerTimesCommand);
   context.subscriptions.push(showHadithCommand);
 
-
   const position = vscode.workspace
     .getConfiguration()
     .get<string>(CONFIG_KEY_POSITION);
@@ -79,7 +78,6 @@ async function fetchPrayerTimes() {
       `${prayerTimes.fajar18.short}`,
       `${prayerTimes.noon.short}`,
       `${prayerTimes.asar1.short}`,
-      `${prayerTimes.asar2.short}`,
       `${prayerTimes.magrib12.short}`,
       `${prayerTimes.esha.short}`,
     ];
@@ -115,72 +113,6 @@ async function fetchPrayerTimes() {
   }
 }
 
-function schedulePrayerHadithNotifications(times: string[]) {
-  const currentTime = new Date();
-  const currentSecs = Math.floor(currentTime.getTime() / 1000);
-
-  times.forEach((time, index) => {
-    const prayerTimeSecs = getPrayerTimeSecs(index);
-    if (prayerTimeSecs > currentSecs) {
-      const timeUntilNotification = prayerTimeSecs - currentSecs - 5 * 60; // 5 minutes before prayer time
-      if (timeUntilNotification > 0) {
-        setTimeout(() => {
-          showHadithNotification();
-        }, timeUntilNotification * 1000);
-      }
-    }
-  });
-}
-
-function loadHadiths() {
-  const hadithFilePath = path.join(__dirname, "..", "hadith.json");
-  fs.readFile(hadithFilePath, "utf8", (err, data) => {
-    if (err) {
-      console.error("Error loading hadiths:", err);
-      return;
-    }
-    try {
-      hadiths = JSON.parse(data);
-    } catch (error) {
-      console.error("Error parsing hadiths:", error);
-    }
-  });
-}
-
-function showHadithNotification() {
-  if (hadiths.length === 0) {
-    console.error("No hadiths loaded");
-    return;
-  }
-  const randomIndex = Math.floor(Math.random() * hadiths.length);
-  const hadith = hadiths[randomIndex];
-  vscode.window.showInformationMessage(
-    `Hadith: ${hadith.hadith}\n\nReference: ${hadith.reference}`,
-    { modal: false }
-  );
-}
-
-function showAllPrayerTimes() {
-  const locationName =
-    locationInfo?.name || locationInfo?.location || "Unknown Location";
-  const message = `
-        Location: ${locationName}
-        Sehri: ${prayerTimes.sehri.long}
-        Fajr: ${prayerTimes.fajar18.long}
-        Ishraq: ${prayerTimes.ishraq.long}
-        Rise: ${prayerTimes.rise.long}
-        Dhuhr: ${prayerTimes.noon.long}
-        Asar: ${prayerTimes.asar1.long} - ${prayerTimes.asar2.long}
-        Maghrib: ${prayerTimes.magrib12.long} (End: ${prayerTimes.esha.long})
-        Isha: ${prayerTimes.esha.long}
-        Tahajjud: ${prayerTimes.night2.long} & ${prayerTimes.night6.long}
-        Set: ${prayerTimes.set.long}
-    `;
-  vscode.window.showInformationMessage(`Prayer Times:\n${message}`, {
-    modal: true,
-  });
-}
-
 function getCurrentPrayer(prayerNames: string[], times: string[]) {
   const currentTime = new Date();
   const currentSecs = Math.floor(currentTime.getTime() / 1000);
@@ -195,9 +127,9 @@ function getCurrentPrayer(prayerNames: string[], times: string[]) {
     {
       name: "Dhuhr",
       start: prayerTimes.noon.secs,
-      end: prayerTimes.asar2.secs,
+      end: prayerTimes.asar1.secs,
     },
-    { name: "Asr", start: prayerTimes.asar2.secs, end: prayerTimes.set.secs },
+    { name: "Asr", start: prayerTimes.asar1.secs, end: prayerTimes.set.secs },
     {
       name: "Maghrib",
       start: prayerTimes.magrib12.secs,
@@ -206,8 +138,8 @@ function getCurrentPrayer(prayerNames: string[], times: string[]) {
     {
       name: "Isha",
       start: prayerTimes.esha.secs,
-      end: prayerTimes.sehri.secs + 86400,
-    }, // Add 24 hours for next day's Sehri
+      end: prayerTimes.fajar18.secs + 86400,
+    }, // Add 24 hours for next day's Fajr
   ];
 
   // Find current prayer
@@ -268,12 +200,69 @@ function getCurrentPrayer(prayerNames: string[], times: string[]) {
   };
 }
 
-function getMidnightSecs() {
-  const now = new Date();
-  return Math.floor(
-    new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() /
-      1000
+function schedulePrayerHadithNotifications(times: string[]) {
+  const currentTime = new Date();
+  const currentSecs = Math.floor(currentTime.getTime() / 1000);
+
+  times.forEach((time, index) => {
+    const prayerTimeSecs = getPrayerTimeSecs(index);
+    if (prayerTimeSecs > currentSecs) {
+      const timeUntilNotification = prayerTimeSecs - currentSecs - 5 * 60; // 5 minutes before prayer time
+      if (timeUntilNotification > 0) {
+        setTimeout(() => {
+          showHadithNotification();
+        }, timeUntilNotification * 1000);
+      }
+    }
+  });
+}
+
+function loadHadiths() {
+  const hadithFilePath = path.join(__dirname, "..", "hadith.json");
+  fs.readFile(hadithFilePath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Error loading hadiths:", err);
+      return;
+    }
+    try {
+      hadiths = JSON.parse(data);
+    } catch (error) {
+      console.error("Error parsing hadiths:", error);
+    }
+  });
+}
+
+function showHadithNotification() {
+  if (hadiths.length === 0) {
+    console.error("No hadiths loaded");
+    return;
+  }
+  const randomIndex = Math.floor(Math.random() * hadiths.length);
+  const hadith = hadiths[randomIndex];
+  vscode.window.showInformationMessage(
+    `Hadith: ${hadith.hadith}\n\nReference: ${hadith.reference}`,
+    { modal: false }
   );
+}
+
+function showAllPrayerTimes() {
+  const locationName =
+    locationInfo?.name || locationInfo?.location || "Unknown Location";
+  const message = `
+        Location: ${locationName}
+        Sehri: ${prayerTimes.sehri.long}
+        Fajr: ${prayerTimes.fajar18.long}
+        Sunrise: ${prayerTimes.rise.long}
+        Dhuhr: ${prayerTimes.noon.long}
+        Asr: ${prayerTimes.asar2.long}
+        Sunset: ${prayerTimes.set.long}
+        Maghrib: ${prayerTimes.magrib12.long}
+        Isha: ${prayerTimes.esha.long}
+        Tahajjud: ${prayerTimes.night2.long} & ${prayerTimes.night6.long}
+    `;
+  vscode.window.showInformationMessage(`Prayer Times:\n${message}`, {
+    modal: true,
+  });
 }
 
 function getPrayerTimeSecs(index: number) {
@@ -283,7 +272,7 @@ function getPrayerTimeSecs(index: number) {
     case 1:
       return prayerTimes.noon.secs; // Dhuhr
     case 2:
-      return prayerTimes.asar2.secs; // Asar start
+      return prayerTimes.asar1.secs; // Asr
     case 3:
       return prayerTimes.magrib12.secs; // Maghrib
     case 4:
@@ -312,14 +301,22 @@ function setPrayerAlarms(times: string[]) {
   const currentTime = new Date();
   const currentSecs = Math.floor(currentTime.getTime() / 1000);
 
-  for (let time of times) {
-    const prayerTimeSecs = getPrayerTimeSecs(times.indexOf(time));
+  const alarmTimes = [
+    { name: "Fajr", time: prayerTimes.fajar18.secs },
+    { name: "Dhuhr", time: prayerTimes.noon.secs },
+    { name: "Asr", time: prayerTimes.asar1.secs },
+    { name: "Maghrib", time: prayerTimes.magrib12.secs },
+    { name: "Isha", time: prayerTimes.esha.secs },
+  ];
 
-    if (prayerTimeSecs > currentSecs) {
-      const timeUntilAlarm = prayerTimeSecs - currentSecs;
+  for (let alarm of alarmTimes) {
+    if (alarm.time > currentSecs) {
+      const timeUntilAlarm = alarm.time - currentSecs;
 
       const timeout = setTimeout(() => {
-        vscode.window.showInformationMessage(`It's time for prayer! (${time})`);
+        vscode.window.showInformationMessage(
+          `It's time for ${alarm.name} prayer!`
+        );
       }, timeUntilAlarm * 1000);
 
       prayerAlarmTimeouts.push(timeout);
