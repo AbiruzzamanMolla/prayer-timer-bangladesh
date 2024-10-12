@@ -4,6 +4,11 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 # Changelog
 
+## [0.4.202420125-6] - 2024-10-12
+### Added
+- New command: "Show Random Hadith" to manually trigger a hadith notification.
+- Error handling for cases when no hadiths are loaded.
+
 ## [0.4.202420063] - 2024-10-06
 ### Added
 - **Hadith Notifications**: Display hadith related to prayer times five minutes before each prayer.

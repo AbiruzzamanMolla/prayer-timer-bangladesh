@@ -2,7 +2,7 @@
   "name": "prayer-timer-bangladesh",
   "displayName": "Prayer Timer Bangladesh",
   "description": "The Prayer Timer Bangladesh extension provides an easy and convenient way to track prayer times based on your GPS location within Bangladesh. With this extension, you can seamlessly integrate prayer time notifications into your Visual Studio Code environment.",
-  "version": "0.4.202420063",
+  "version": "0.4.202420126",
   "preview": true,
   "publisher": "azmolla",
   "icon": "icon.png",
@@ -28,7 +28,8 @@
   "activationEvents": [
     "onStartupFinished",
     "onCommand:prayer-timer-bangladesh.showPrayerTimes",
-    "onCommand:prayer-timer-bangladesh.showAllPrayerTimes"
+    "onCommand:prayer-timer-bangladesh.showAllPrayerTimes",
+    "onCommand:prayer-timer-bangladesh.showHadith"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -40,6 +41,10 @@
       {
         "command": "prayer-timer-bangladesh.showAllPrayerTimes",
         "title": "Show All Prayer Times"
+      },
+      {
+        "command": "prayer-timer-bangladesh.showHadith",
+        "title": "Show Random Hadith"
       }
     ],
     "configuration": {

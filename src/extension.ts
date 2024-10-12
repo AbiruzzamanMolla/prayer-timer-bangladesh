@@ -34,8 +34,17 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const showHadithCommand = vscode.commands.registerCommand(
+    "prayer-timer-bangladesh.showHadith",
+    () => {
+      showHadithNotification();
+    }
+  );
+
   context.subscriptions.push(showPrayerTimesCommand);
   context.subscriptions.push(showAllPrayerTimesCommand);
+  context.subscriptions.push(showHadithCommand);
+
 
   const position = vscode.workspace
     .getConfiguration()
@@ -83,6 +92,7 @@ async function fetchPrayerTimes() {
     const isActive = vscode.workspace
       .getConfiguration()
       .get<boolean>(CONFIG_KEY_ACTIVE);
+
     if (isActive) {
       const currentPrayer = getCurrentPrayer(prayerNames, allPrayerTimes);
       if (currentPrayer) {
@@ -92,14 +102,8 @@ async function fetchPrayerTimes() {
           currentPrayer.remainingTime
         );
 
-        // Show hadith notification 5 minutes before the current prayer time
-        const currentTime = new Date();
-        const prayerTimeDate = new Date(currentPrayer.time); // Convert prayer time string to Date
-        const timeDiff = prayerTimeDate.getTime() - currentTime.getTime();
-        if (timeDiff <= 5 * 60 * 1000) {
-          // 5 minutes in milliseconds
-          showHadithNotification();
-        }
+        // Schedule hadith notifications for all prayer times
+        schedulePrayerHadithNotifications(allPrayerTimes);
       }
 
       setPrayerAlarms(allPrayerTimes);
@@ -111,8 +115,25 @@ async function fetchPrayerTimes() {
   }
 }
 
+function schedulePrayerHadithNotifications(times: string[]) {
+  const currentTime = new Date();
+  const currentSecs = Math.floor(currentTime.getTime() / 1000);
+
+  times.forEach((time, index) => {
+    const prayerTimeSecs = getPrayerTimeSecs(index);
+    if (prayerTimeSecs > currentSecs) {
+      const timeUntilNotification = prayerTimeSecs - currentSecs - 5 * 60; // 5 minutes before prayer time
+      if (timeUntilNotification > 0) {
+        setTimeout(() => {
+          showHadithNotification();
+        }, timeUntilNotification * 1000);
+      }
+    }
+  });
+}
+
 function loadHadiths() {
-  const hadithFilePath = path.join(__dirname, "hadith.json");
+  const hadithFilePath = path.join(__dirname, "..", "hadith.json");
   fs.readFile(hadithFilePath, "utf8", (err, data) => {
     if (err) {
       console.error("Error loading hadiths:", err);
@@ -127,10 +148,15 @@ function loadHadiths() {
 }
 
 function showHadithNotification() {
+  if (hadiths.length === 0) {
+    console.error("No hadiths loaded");
+    return;
+  }
   const randomIndex = Math.floor(Math.random() * hadiths.length);
   const hadith = hadiths[randomIndex];
   vscode.window.showInformationMessage(
-    `${hadith.hadith} - ${hadith.reference}`
+    `Hadith: ${hadith.hadith}\n\nReference: ${hadith.reference}`,
+    { modal: false }
   );
 }
 
@@ -157,56 +183,88 @@ function showAllPrayerTimes() {
 
 function getCurrentPrayer(prayerNames: string[], times: string[]) {
   const currentTime = new Date();
-  const currentSecs = Math.floor(currentTime.getTime() / 1000); // Get current time in seconds
-  const midnightSecs = getMidnightSecs(); // Get midnight time in seconds
+  const currentSecs = Math.floor(currentTime.getTime() / 1000);
 
-  for (let i = 0; i < times.length; i++) {
-    const prayerTimeSecs = getPrayerTimeSecs(i);
+  // Define prayer time ranges
+  const prayerRanges = [
+    {
+      name: "Fajr",
+      start: prayerTimes.fajar18.secs,
+      end: prayerTimes.rise.secs,
+    },
+    {
+      name: "Dhuhr",
+      start: prayerTimes.noon.secs,
+      end: prayerTimes.asar2.secs,
+    },
+    { name: "Asr", start: prayerTimes.asar2.secs, end: prayerTimes.set.secs },
+    {
+      name: "Maghrib",
+      start: prayerTimes.magrib12.secs,
+      end: prayerTimes.esha.secs,
+    },
+    {
+      name: "Isha",
+      start: prayerTimes.esha.secs,
+      end: prayerTimes.sehri.secs + 86400,
+    }, // Add 24 hours for next day's Sehri
+  ];
 
-    // Check if the current time is before the next prayer time
-    if (prayerTimeSecs > currentSecs) {
-      const remainingTime = prayerTimeSecs - currentSecs;
+  // Find current prayer
+  for (let range of prayerRanges) {
+    if (currentSecs >= range.start && currentSecs < range.end) {
+      const remainingTime = range.end - currentSecs;
       const hours = Math.floor(remainingTime / 3600);
       const minutes = Math.floor((remainingTime % 3600) / 60);
       return {
-        name: prayerNames[i],
-        time: times[i],
+        name: range.name,
+        time: new Date(range.start * 1000).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
         remainingTime: `${hours}h ${minutes}m left`,
       };
     }
   }
 
-  // Handle the case where the last prayer is over
-  const lastPrayerTimeSecs = getPrayerTimeSecs(times.length - 1);
-  if (currentSecs > lastPrayerTimeSecs) {
-    // Isha time is over, check for Tahajjud
-    if (currentSecs < midnightSecs) {
-      const remainingTime = midnightSecs - currentSecs;
-      const hours = Math.floor(remainingTime / 3600);
-      const minutes = Math.floor((remainingTime % 3600) / 60);
-      return {
-        name: "Isha",
-        time: times[times.length - 1],
-        remainingTime: `${hours}h ${minutes}m until midnight`,
-      };
-    } else {
-      // Past midnight, show time until Fajr
-      const nextFajrTimeSecs = prayerTimes.fajar18.secs; // Assuming Fajr is the next prayer
-      const remainingTime = nextFajrTimeSecs + 86400 - currentSecs; // Add 24 hours for next day's Fajr
-      const hours = Math.floor(remainingTime / 3600);
-      const minutes = Math.floor((remainingTime % 3600) / 60);
-      return {
-        name: "Tahajjud",
-        time: times[times.length - 1],
-        remainingTime: `${hours}h ${minutes}m until Fajr`,
-      };
-    }
+  // If no current prayer (between Fajr end and Dhuhr start, or between Asr end and Maghrib start)
+  if (
+    currentSecs >= prayerTimes.rise.secs &&
+    currentSecs < prayerTimes.noon.secs
+  ) {
+    const remainingTime = prayerTimes.noon.secs - currentSecs;
+    const hours = Math.floor(remainingTime / 3600);
+    const minutes = Math.floor((remainingTime % 3600) / 60);
+    return {
+      name: "Next: Dhuhr",
+      time: new Date(prayerTimes.noon.secs * 1000).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      remainingTime: `${hours}h ${minutes}m until Dhuhr`,
+    };
+  } else if (
+    currentSecs >= prayerTimes.set.secs &&
+    currentSecs < prayerTimes.magrib12.secs
+  ) {
+    const remainingTime = prayerTimes.magrib12.secs - currentSecs;
+    const hours = Math.floor(remainingTime / 3600);
+    const minutes = Math.floor((remainingTime % 3600) / 60);
+    return {
+      name: "Next: Maghrib",
+      time: new Date(prayerTimes.magrib12.secs * 1000).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      remainingTime: `${hours}h ${minutes}m until Maghrib`,
+    };
   }
 
+  // This should never happen, but just in case
   return {
-    name: prayerNames[prayerNames.length - 1],
-    time: times[times.length - 1],
-    remainingTime: "Pray Isha and Tahajjud",
+    name: "Unknown",
+    time: "N/A",
+    remainingTime: "N/A",
   };
 }
 
@@ -225,12 +283,10 @@ function getPrayerTimeSecs(index: number) {
     case 1:
       return prayerTimes.noon.secs; // Dhuhr
     case 2:
-      return prayerTimes.asar1.secs; // Asar start
+      return prayerTimes.asar2.secs; // Asar start
     case 3:
-      return prayerTimes.asar2.secs; // Asar end
-    case 4:
       return prayerTimes.magrib12.secs; // Maghrib
-    case 5:
+    case 4:
       return prayerTimes.esha.secs; // Isha
     default:
       return 0;
