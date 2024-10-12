@@ -67,7 +67,8 @@ async function fetchPrayerTimes() {
       .getConfiguration()
       .get<string>(CONFIG_KEY_TZNAME);
 
-    const apiUrl = `https://salat.habibur.com/api/?lat=${lat}&lng=${lng}&tzoffset=360&tzname=${tzname}`;
+    const tzOffset = new Date().getTimezoneOffset() * -60;
+    const apiUrl = `https://salat.habibur.com/api/?lat=${lat}&lng=${lng}&tzoffset=${tzOffset}&tzname=${tzname}`;
 
     const response = await axios.get(apiUrl);
     prayerTimes = response.data.data;
