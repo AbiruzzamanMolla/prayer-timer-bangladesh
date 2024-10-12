@@ -4,7 +4,34 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 # Changelog
 
-## [0.4.202420125-6-7] - 2024-10-12
+## [1.0.0] - 2024-10-12
+### Added
+- New command: "Show Random Hadith" to manually trigger a hadith notification.
+- Hadith notifications: Display hadith related to prayer times five minutes before each prayer.
+- Support for configuring GPS coordinates with default values for latitude and longitude.
+- Timezone setting defaulted to `Asia/Dhaka`.
+- Option to customize the position of the time display in the status bar (`left` or `right`).
+- Option to toggle the visibility of prayer times in the status bar.
+- Icon for the extension.
+
+### Changed
+- Adjusted the text in the status bar to indicate the remaining time for Isha as "Isha (time Awaal wakth left)".
+- Improved notification logic: Notifications for prayer times have been refined to provide accurate remaining time messages.
+- Updated hadith data structure in `hadith.json`.
+
+### Fixed
+- Error handling for cases when no hadiths are loaded.
+- Corrected status messages to reflect accurate prayer times based on the current clock.
+- Fixed the behavior during the prohibited time between Asr End and Maghrib, displaying a message indicating that prayer is prohibited and the remaining time until Maghrib (e.g., `Prohibited Time: No prayer (Maghrib in 25m)`).
+- Proper initialization of commands upon startup.
+- Corrected prayer time display based on GPS coordinates.
+
+### Improved
+- Enhanced the display format for currently active prayer time to show remaining time (e.g., `Prayer Time: Asr (2h 30m left)`).
+- Optimized the logic for calculating and displaying the currently active prayer time and its remaining duration.
+- Refactored relevant functions for better clarity and maintainability.
+
+## [0.4.202420125-6-7-8-9] - 2024-10-12
 ### Added
 - New command: "Show Random Hadith" to manually trigger a hadith notification.
 - Error handling for cases when no hadiths are loaded.
