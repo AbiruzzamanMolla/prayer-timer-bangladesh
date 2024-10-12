@@ -6,6 +6,7 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 ## [1.0.0] - 2024-10-12
 ### Added
+- Multi-Language Support (English & Bangla)
 - New command: "Show Random Hadith" to manually trigger a hadith notification.
 - Hadith notifications: Display hadith related to prayer times five minutes before each prayer.
 - Support for configuring GPS coordinates with default values for latitude and longitude.
