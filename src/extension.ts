@@ -296,9 +296,9 @@ function updatePrayerTimesStatusBar(
   prayerTime: string,
   remainingTime: string
 ) {
-  prayerTimesStatusBar.text = `${localize(
+  prayerTimesStatusBar.text = `🕌 ${localize(
     "prayerTimes"
-  )}: ${prayerName} (${remainingTime})`;
+  )}: ${prayerName} ($(clock) ${remainingTime})`;
   prayerTimesStatusBar.tooltip = localize("prayerTimes");
   prayerTimesStatusBar.command = "prayer-timer-bangladesh.showAllPrayerTimes";
 

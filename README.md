@@ -7,13 +7,16 @@
 ## Features
 
 - **Dynamic GPS-Based Prayer Times**: Automatically retrieves prayer times based on your current latitude and longitude.
+
 - **Customizable Settings**:
+  - Set Default Language (Currently: English and Bangla)
   - Configure default latitude and longitude for your location.
   - Set the timezone (default: `Asia/Dhaka`).
   - Choose the position of prayer times in the status bar (`left` or `right`).
   - Toggle visibility of prayer times in the status bar.
 
   ![Prayer Timer Bangladesh Icon](./screenshots/seetings.png)
+
 - **Commands**:
   - `Display Prayer Times`: Shows current prayer time in the status bar.
   - `Show All Prayer Times`: Displays all prayer times in a list.
@@ -22,11 +25,13 @@
   
 - **Status Bar Integration**: Seamlessly displays the current prayer time in the status bar without disrupting your workflow.
 
-  ![Prayer Timer Bangladesh Icon](./screenshots/timer-in-status-bar.png)
+  ![Prayer Timer Bangladesh Icon](./screenshots/timer-in-status-bar-en.png)
+  ![Prayer Timer Bangladesh Icon - Bangla](./screenshots/timer-in-status-bar-bn.png)
 
 - **Show All Prayer Times**: By Clicking on the status bar item, you can see all prayer times in a list.
 
-  ![Prayer Timer Bangladesh Icon](./screenshots/show-all-times.png)
+  ![Prayer Timer Bangladesh Icon](./screenshots/show-all-times-en.png)
+  ![Prayer Timer Bangladesh Icon - Bangla](./screenshots/show-all-times-bn.png)
 
 ## Installation
 
@@ -70,6 +75,10 @@
   - Command: `prayer-timer-bangladesh.showAllPrayerTimes`
   - Displays a list of all prayer times.
 
+- **Show Hadith Notification**:
+  - Command: `prayer-timer-bangladesh.showHadith`
+  - Show a random Hadith.
+
 ### Configuration
 
 You can configure the extension by editing your `settings.json` file in VS Code. Available settings:
@@ -80,7 +89,8 @@ You can configure the extension by editing your `settings.json` file in VS Code.
   "prayerTimerBangladesh.lng": 90.7061,
   "prayerTimerBangladesh.tzname": "Asia/Dhaka",
   "prayerTimerBangladesh.position": "right",
-  "prayerTimerBangladesh.active": true
+  "prayerTimerBangladesh.active": true,
+  "prayerTimerBangladesh.language": "English",
 }
 ```
 
@@ -88,6 +98,7 @@ You can configure the extension by editing your `settings.json` file in VS Code.
 
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
+| `prayerTimerBangladesh.language` | enum | `English` or `Bangla` | Change the language of the texts. |
 | `prayerTimerBangladesh.lat` | number | 24.0298 | Latitude for prayer times. |
 | `prayerTimerBangladesh.lng` | number | 90.7061 | Longitude for prayer times. |
 | `prayerTimerBangladesh.tzname` | string | `Asia/Dhaka` | Timezone for prayer times. |

@@ -4,6 +4,11 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 # Changelog
 
+## [1.0.1] - 2024-10-13
+### Added
+- Emoji and Icon in status bar
+- Changed Extention Icon
+
 ## [1.0.0] - 2024-10-12
 ### Added
 - Multi-Language Support (English & Bangla)
