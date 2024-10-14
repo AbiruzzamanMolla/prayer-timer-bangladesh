@@ -79,6 +79,10 @@
   - Command: `prayer-timer-bangladesh.showHadith`
   - Show a random Hadith.
 
+- **Clean Prayer Timer from Memory**:
+  - Command: `prayer-timer-bangladesh.resetPrayerTimes`
+  - Description: Clears the stored prayer times and location information from memory and resets the timer.
+
 ### Configuration
 
 You can configure the extension by editing your `settings.json` file in VS Code. Available settings:

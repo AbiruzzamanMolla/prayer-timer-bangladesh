@@ -4,6 +4,13 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 # Changelog
 
+## [1.0.4] - 2024-10-14
+### Added
+- Store Prayer time to local storage.
+
+### Fixed
+- Location missing issue fixed.
+
 ## [1.0.3] - 2024-10-14
 ### Fixed
 - removed text "Prayer Timer:"

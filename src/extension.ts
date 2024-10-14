@@ -15,17 +15,37 @@ let prayerTimesStatusBar: vscode.StatusBarItem;
 let prayerAlarmTimeouts: NodeJS.Timeout[] = [];
 let allPrayerTimes: string[] = []; // To store all prayer times
 let prayerTimes: any; // To store all prayer data
-let locationInfo: any; // To store all prayer data
+let locationInfo: any; // To store location data
 let hadiths: any[] = []; // To store hadiths
 let updatePrayerTimesInterval: NodeJS.Timeout;
 
+// Keys to store prayer times and location info in global state
+const PRAYER_TIMES_KEY = "prayerTimesBangladesh";
+const LOCATION_INFO_KEY = "locationInfoBangladesh";
+const LAST_CLEAN_KEY = "lastCleanTimestamp"; // Key to store last clean timestamp
+const CLEAN_INTERVAL_HOURS = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
+
 export function activate(context: vscode.ExtensionContext) {
+  // Check if it's time to clean local storage
+  const lastClean = context.globalState.get<number>(LAST_CLEAN_KEY);
+  const currentTime = new Date().getTime();
+
+  if (!lastClean || currentTime - lastClean > CLEAN_INTERVAL_HOURS) {
+    // If more than 12 hours have passed, clear the stored data
+    context.globalState.update(PRAYER_TIMES_KEY, undefined);
+    context.globalState.update(LOCATION_INFO_KEY, undefined);
+    console.log("Cleared local storage after 12 hours.");
+
+    // Update the last clean timestamp to the current time
+    context.globalState.update(LAST_CLEAN_KEY, currentTime);
+  }
+
   loadHadiths(); // Load hadiths on activation
 
   const showPrayerTimesCommand = vscode.commands.registerCommand(
     "prayer-timer-bangladesh.showPrayerTimes",
     async () => {
-      await fetchPrayerTimes();
+      await loadPrayerTimes(context);
     }
   );
 
@@ -43,9 +63,22 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const resetPrayerTimesCommand = vscode.commands.registerCommand(
+    "prayer-timer-bangladesh.resetPrayerTimes",
+    () => {
+      context.globalState.update(PRAYER_TIMES_KEY, undefined); // Clear the stored prayer times
+      context.globalState.update(LOCATION_INFO_KEY, undefined); // Clear the stored location info
+      vscode.window.showInformationMessage(
+        "Prayer times and location info have been reset."
+      );
+      console.log("Prayer times and location info cleared from global state.");
+    }
+  );
+
   context.subscriptions.push(showPrayerTimesCommand);
   context.subscriptions.push(showAllPrayerTimesCommand);
   context.subscriptions.push(showHadithCommand);
+  context.subscriptions.push(resetPrayerTimesCommand);
 
   const position = vscode.workspace
     .getConfiguration()
@@ -61,7 +94,27 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.executeCommand("prayer-timer-bangladesh.showPrayerTimes");
 }
 
-async function fetchPrayerTimes() {
+async function loadPrayerTimes(context: vscode.ExtensionContext) {
+  try {
+    // Check if prayer times and location info are already saved in global state
+    const savedPrayerTimes = context.globalState.get<any>(PRAYER_TIMES_KEY);
+    const savedLocationInfo = context.globalState.get<any>(LOCATION_INFO_KEY);
+
+    if (savedPrayerTimes && savedLocationInfo) {
+      prayerTimes = savedPrayerTimes;
+      locationInfo = savedLocationInfo;
+      setPrayerData();
+      console.log("Loaded prayer times and location info from global state.");
+    } else {
+      // Fetch new prayer times if not present in global state
+      await fetchPrayerTimes(context);
+    }
+  } catch (error) {
+    vscode.window.showErrorMessage(`Failed to load prayer times: ${error}`);
+  }
+}
+
+async function fetchPrayerTimes(context: vscode.ExtensionContext) {
   try {
     const lat = vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_LAT);
     const lng = vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_LNG);
@@ -72,61 +125,75 @@ async function fetchPrayerTimes() {
     const apiUrl = `https://salat.habibur.com/api/?lat=${lat}&lng=${lng}&tzoffset=360&tzname=${tzname}`;
 
     const response = await axios.get(apiUrl);
+    const rLocation = response.data.tzname || "Unknown";
+    const rName = response.data.name || "Unknown";
+
     prayerTimes = response.data.data;
 
-    const prayerNames = localize("prayers"); // Get localized prayer names
-
-    allPrayerTimes = [
-      `${prayerTimes.fajar18.short}`,
-      `${prayerTimes.noon.short}`,
-      `${prayerTimes.asar2.short}`,
-      `${prayerTimes.magrib12.short}`,
-      `${prayerTimes.esha.short}`,
-    ];
-
     locationInfo = {
-      location: response.data.tzname,
-      name: response.data.name,
+      location: rLocation,
+      name: rName,
     };
 
-    const isActive = vscode.workspace
-      .getConfiguration()
-      .get<boolean>(CONFIG_KEY_ACTIVE);
+    // Save fetched prayer times and location info to global state
+    context.globalState.update(PRAYER_TIMES_KEY, prayerTimes);
+    context.globalState.update(LOCATION_INFO_KEY, locationInfo);
+    console.log(
+      "Prayer times and location info fetched and saved to global state."
+    );
 
-    if (isActive) {
-      const currentPrayer = getCurrentPrayer(prayerNames, allPrayerTimes);
-      if (currentPrayer) {
-        updatePrayerTimesStatusBar(
-          currentPrayer.name,
-          currentPrayer.time,
-          currentPrayer.remainingTime
-        );
-
-        // Clear any existing interval before setting a new one
-        if (updatePrayerTimesInterval) {
-          clearInterval(updatePrayerTimesInterval);
-        }
-
-        // Set an interval to update the remaining time every minute
-        updatePrayerTimesInterval = setInterval(() => {
-          const updatedPrayer = getCurrentPrayer(prayerNames, allPrayerTimes);
-          if (updatedPrayer) {
-            updatePrayerTimesStatusBar(
-              updatedPrayer.name,
-              updatedPrayer.time,
-              updatedPrayer.remainingTime
-            );
-          }
-        }, 60000); // 60,000 ms = 1 minute
-
-        setPrayerAlarms(allPrayerTimes); // Schedule the prayer alarms
-        schedulePrayerHadithNotifications(allPrayerTimes); // Schedule hadith notifications
-      }
-    } else {
-      prayerTimesStatusBar.hide(); // Hide if not active
-    }
+    setPrayerData();
   } catch (error) {
     vscode.window.showErrorMessage(`Failed to fetch prayer times: ${error}`);
+  }
+}
+
+function setPrayerData() {
+  const prayerNames = localize("prayers");
+
+  allPrayerTimes = [
+    `${prayerTimes.fajar18.short}`,
+    `${prayerTimes.noon.short}`,
+    `${prayerTimes.asar2.short}`,
+    `${prayerTimes.magrib12.short}`,
+    `${prayerTimes.esha.short}`,
+  ];
+
+  const isActive = vscode.workspace
+    .getConfiguration()
+    .get<boolean>(CONFIG_KEY_ACTIVE);
+
+  if (isActive) {
+    const currentPrayer = getCurrentPrayer(prayerNames, allPrayerTimes);
+    if (currentPrayer) {
+      updatePrayerTimesStatusBar(
+        currentPrayer.name,
+        currentPrayer.time,
+        currentPrayer.remainingTime
+      );
+
+      // Clear any existing interval before setting a new one
+      if (updatePrayerTimesInterval) {
+        clearInterval(updatePrayerTimesInterval);
+      }
+
+      // Set an interval to update the remaining time every minute
+      updatePrayerTimesInterval = setInterval(() => {
+        const updatedPrayer = getCurrentPrayer(prayerNames, allPrayerTimes);
+        if (updatedPrayer) {
+          updatePrayerTimesStatusBar(
+            updatedPrayer.name,
+            updatedPrayer.time,
+            updatedPrayer.remainingTime
+          );
+        }
+      }, 60000); // 60,000 ms = 1 minute
+
+      setPrayerAlarms(allPrayerTimes); // Schedule the prayer alarms
+      schedulePrayerHadithNotifications(allPrayerTimes); // Schedule hadith notifications
+    }
+  } else {
+    prayerTimesStatusBar.hide(); // Hide if not active
   }
 }
 
