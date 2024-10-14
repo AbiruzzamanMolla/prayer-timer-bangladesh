@@ -25,6 +25,9 @@ const LOCATION_INFO_KEY = "locationInfoBangladesh";
 const LAST_CLEAN_KEY = "lastCleanTimestamp"; // Key to store last clean timestamp
 const CLEAN_INTERVAL_HOURS = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
 
+// Store previous config for comparison
+let previousConfig: vscode.WorkspaceConfiguration | undefined;
+
 export function activate(context: vscode.ExtensionContext) {
   // Check if it's time to clean local storage
   const lastClean = context.globalState.get<number>(LAST_CLEAN_KEY);
@@ -39,6 +42,25 @@ export function activate(context: vscode.ExtensionContext) {
     // Update the last clean timestamp to the current time
     context.globalState.update(LAST_CLEAN_KEY, currentTime);
   }
+
+  // Load previous configuration to track changes
+  previousConfig = vscode.workspace.getConfiguration();
+
+  // Monitor settings changes
+  vscode.workspace.onDidChangeConfiguration((event) => {
+    const newConfig = vscode.workspace.getConfiguration();
+    if (event.affectsConfiguration("prayerTimerBangladesh")) {
+      if (settingsChanged(previousConfig, newConfig)) {
+        context.globalState.update(PRAYER_TIMES_KEY, undefined);
+        context.globalState.update(LOCATION_INFO_KEY, undefined);
+        vscode.window.showInformationMessage(
+          "Settings changed. Restarting Prayer Timer Bangladesh extension and clearing stored data."
+        );
+        vscode.commands.executeCommand("workbench.action.reloadWindow");
+      }
+    }
+    previousConfig = newConfig;
+  });
 
   loadHadiths(); // Load hadiths on activation
 
@@ -94,9 +116,23 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.commands.executeCommand("prayer-timer-bangladesh.showPrayerTimes");
 }
 
+function settingsChanged(
+  oldConfig: vscode.WorkspaceConfiguration | undefined,
+  newConfig: vscode.WorkspaceConfiguration
+): boolean {
+  if (!oldConfig) {return true;} // On first run, assume settings changed
+  return (
+    oldConfig.get(CONFIG_KEY_LAT) !== newConfig.get(CONFIG_KEY_LAT) ||
+    oldConfig.get(CONFIG_KEY_LNG) !== newConfig.get(CONFIG_KEY_LNG) ||
+    oldConfig.get(CONFIG_KEY_TZNAME) !== newConfig.get(CONFIG_KEY_TZNAME) ||
+    oldConfig.get(CONFIG_KEY_POSITION) !== newConfig.get(CONFIG_KEY_POSITION) ||
+    oldConfig.get(CONFIG_KEY_ACTIVE) !== newConfig.get(CONFIG_KEY_ACTIVE) ||
+    oldConfig.get(CONFIG_KEY_LANGUAGE) !== newConfig.get(CONFIG_KEY_LANGUAGE)
+  );
+}
+
 async function loadPrayerTimes(context: vscode.ExtensionContext) {
   try {
-    // Check if prayer times and location info are already saved in global state
     const savedPrayerTimes = context.globalState.get<any>(PRAYER_TIMES_KEY);
     const savedLocationInfo = context.globalState.get<any>(LOCATION_INFO_KEY);
 
@@ -106,7 +142,6 @@ async function loadPrayerTimes(context: vscode.ExtensionContext) {
       setPrayerData();
       console.log("Loaded prayer times and location info from global state.");
     } else {
-      // Fetch new prayer times if not present in global state
       await fetchPrayerTimes(context);
     }
   } catch (error) {
@@ -135,7 +170,6 @@ async function fetchPrayerTimes(context: vscode.ExtensionContext) {
       name: rName,
     };
 
-    // Save fetched prayer times and location info to global state
     context.globalState.update(PRAYER_TIMES_KEY, prayerTimes);
     context.globalState.update(LOCATION_INFO_KEY, locationInfo);
     console.log(
