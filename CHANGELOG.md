@@ -4,6 +4,10 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 # Changelog
 
+## [1.0.3] - 2024-10-14
+### Fixed
+- removed text "Prayer Timer:"
+
 ## [1.0.2] - 2024-10-13
 ### Fixed
 - update status bar timer every 60 sec.
