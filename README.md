@@ -36,13 +36,13 @@
 ## Installation
 
 1. **Install via Marketplace**:
-   - Open Visual Studio Code.
+   - Open Visual Studio Code or VSCodium.
    - Go to the Extensions view by clicking on the Extensions icon in the Activity Bar.
    - Search for **Prayer Timer Bangladesh** and click **Install**.
 
    ![Prayer Timer Bangladesh Icon](./screenshots/search-in-marketplace.png)
 
-   Or visit the extension [on the Marketplace](https://marketplace.visualstudio.com/items?itemName=azmolla.prayer-timer-bangladesh).
+   Or visit the extension [on the VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=azmolla.prayer-timer-bangladesh) or [on the Open VSX Marketplace](https://open-vsx.org/extension/azmolla/prayer-timer-bangladesh).
 
 2. **Install from Source**:
    - Clone the repository:
