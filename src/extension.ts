@@ -502,7 +502,7 @@ function getPrayerTimeSecs(index: number): number {
     case 2:
       return prayerTimes.asar2.secs;
     case 3:
-      return prayerTimes.magrib12.secs;
+      return prayerTimes.set.secs + 2*60;
     case 4:
       return prayerTimes.esha.secs;
     default:
@@ -545,7 +545,7 @@ function showAllPrayerTimes() {
     ${localize("prayers")[0]}: ${prayerTimes.fajar18.long}
     ${localize("prayers")[1]}: ${prayerTimes.noon.long}
     ${localize("prayers")[2]}: ${prayerTimes.asar2.long}
-    ${localize("prayers")[3]}: ${prayerTimes.magrib12.long}
+    ${localize("prayers")[3]}: ${prayerTimes.set.long}
     ${localize("prayers")[4]}: ${prayerTimes.esha.long}
   `;
   vscode.window.showInformationMessage(
@@ -560,7 +560,7 @@ function setPrayerAlarms(times: string[]) {
     { name: prayerNames[0], time: prayerTimes.fajar18.secs },
     { name: prayerNames[1], time: prayerTimes.noon.secs },
     { name: prayerNames[2], time: prayerTimes.asar2.secs },
-    { name: prayerNames[3], time: prayerTimes.magrib12.secs },
+    { name: prayerNames[3], time: prayerTimes.set.secs + 2 * 60 },
     { name: prayerNames[4], time: prayerTimes.esha.secs },
   ];
 
