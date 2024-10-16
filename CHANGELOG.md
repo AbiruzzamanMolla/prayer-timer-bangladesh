@@ -4,6 +4,11 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 # Changelog
 
+## [1.0.5] - 2024-10-16
+### Added
+- Prayer Jamat/congregation notifications
+- Active Jamat notifications from settings
+
 ## [1.0.4] - 2024-10-14
 ### Added
 - Store Prayer time to local storage.

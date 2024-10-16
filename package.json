@@ -92,6 +92,11 @@
           "default": true,
           "description": "Whether to show the prayer time in the status bar."
         },
+        "prayerTimerBangladesh.jamatActive": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to show the prayer congregation notifications."
+        },
         "prayerTimerBangladesh.jamatFajarMinutes": {
           "type": "number",
           "default": 40,
@@ -101,6 +106,21 @@
           "type": "number",
           "default": 90,
           "description": "Add Minutes after Dhuhr prayer for Dhuhr Jamat"
+        },
+        "prayerTimerBangladesh.jamatAsrMinutes": {
+          "type": "number",
+          "default": 45,
+          "description": "Add Minutes after Asr prayer for Asr Jamat"
+        },
+        "prayerTimerBangladesh.jamatMaghribMinutes": {
+          "type": "number",
+          "default": 10,
+          "description": "Add Minutes after Maghrib prayer for Maghrib Jamat"
+        },
+        "prayerTimerBangladesh.jamatIshaMinutes": {
+          "type": "number",
+          "default": 60,
+          "description": "Add Minutes after Isha prayer for Isha Jamat"
         }
       }
     }

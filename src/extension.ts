@@ -10,8 +10,12 @@ const CONFIG_KEY_TZNAME = "prayerTimerBangladesh.tzname";
 const CONFIG_KEY_POSITION = "prayerTimerBangladesh.position";
 const CONFIG_KEY_ACTIVE = "prayerTimerBangladesh.active";
 const CONFIG_KEY_LANGUAGE = "prayerTimerBangladesh.language";
+const CONFIG_KEY_JAMAT_ACTIVE = "prayerTimerBangladesh.jamatActive";
 const CONFIG_KEY_FAJAR_JAMAT = "prayerTimerBangladesh.jamatFajarMinutes";
 const CONFIG_KEY_DHUHR_JAMAT = "prayerTimerBangladesh.jamatDhuhrMinutes";
+const CONFIG_KEY_ASR_JAMAT = "prayerTimerBangladesh.jamatAsrMinutes";
+const CONFIG_KEY_MAGHRIB_JAMAT = "prayerTimerBangladesh.jamatMaghribMinutes";
+const CONFIG_KEY_ISHA_JAMAT = "prayerTimerBangladesh.jamatIshaMinutes";
 
 let prayerTimesStatusBar: vscode.StatusBarItem;
 let prayerAlarmTimeouts: NodeJS.Timeout[] = [];
@@ -180,8 +184,20 @@ async function fetchPrayerTimes(context: vscode.ExtensionContext) {
 
 function setPrayerData() {
   const prayerNames = localize("prayers");
-  const dhuhrJamatMinutes = vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_DHUHR_JAMAT) || 30;
+
   const fajarJamatMinutes = vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_FAJAR_JAMAT) || 30;
+
+  const dhuhrJamatMinutes = vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_DHUHR_JAMAT) || 30;
+
+  const asrJamatMinutes =
+    vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_ASR_JAMAT) || 45;
+  const maghribJamatMinutes =
+    vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_MAGHRIB_JAMAT) ||
+    30;
+  const ishaJamatMinutes =
+    vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_ISHA_JAMAT) ||
+    60;
+
   
   allPrayerTimes = [
     `${prayerTimes.fajar18.short}`,
@@ -199,6 +215,18 @@ function setPrayerData() {
     prayerTimes.noon.secs * 1000 + fajarJamatMinutes * 60 * 1000
   );
 
+  const asrJamatTime = new Date(
+    prayerTimes.asar2.secs * 1000 + asrJamatMinutes * 60 * 1000
+  );
+
+  const maghribJamatTime = new Date(
+    prayerTimes.magrib12.secs * 1000 + maghribJamatMinutes * 60 * 1000
+  );
+
+  const ishaJamatTime = new Date(
+    prayerTimes.esha.secs * 1000 + ishaJamatMinutes * 60 * 1000
+  );
+
   const isActive = vscode.workspace
     .getConfiguration()
     .get<boolean>(CONFIG_KEY_ACTIVE);
@@ -208,7 +236,10 @@ function setPrayerData() {
       prayerNames,
       allPrayerTimes,
       dhuhrJamatTime,
-      fajarJamatTime
+      fajarJamatTime,
+      asrJamatTime,
+      maghribJamatTime,
+      ishaJamatTime
     );
     if (currentPrayer) {
       updatePrayerTimesStatusBar(
@@ -228,7 +259,10 @@ function setPrayerData() {
           prayerNames,
           allPrayerTimes,
           dhuhrJamatTime,
-          fajarJamatTime
+          fajarJamatTime,
+          asrJamatTime,
+          maghribJamatTime,
+          ishaJamatTime
         );
         if (updatedPrayer) {
           updatePrayerTimesStatusBar(
@@ -241,8 +275,18 @@ function setPrayerData() {
 
       setPrayerAlarms(allPrayerTimes); // Schedule the prayer alarms
       schedulePrayerHadithNotifications(allPrayerTimes); // Schedule hadith notifications
-      scheduleJamatNotification(fajarJamatTime);
-      scheduleJamatNotification(dhuhrJamatTime);
+
+      const isJamatActive = vscode.workspace
+        .getConfiguration()
+        .get<boolean>(CONFIG_KEY_JAMAT_ACTIVE);
+
+      if (isJamatActive) {
+        scheduleJamatNotification(fajarJamatTime, prayerNames[0]);
+        scheduleJamatNotification(dhuhrJamatTime, prayerNames[1]);
+        scheduleJamatNotification(asrJamatTime, prayerNames[2]);
+        scheduleJamatNotification(maghribJamatTime, prayerNames[3]);
+        scheduleJamatNotification(ishaJamatTime, prayerNames[4]);
+      }
     }
   } else {
     prayerTimesStatusBar.hide(); // Hide if not active
@@ -290,12 +334,18 @@ function getCurrentPrayer(
   prayerNames: string[],
   times: string[],
   dhuhrJamatTime: Date,
-  fajarJamatTime: Date
+  fajarJamatTime: Date,
+  asrJamatTime: Date,
+  maghribJamatTime: Date,
+  ishaJamatTime: Date
 ) {
   const currentTime = new Date();
   const currentSecs = Math.floor(currentTime.getTime() / 1000);
   const dhuhrJamatSecs = Math.floor(dhuhrJamatTime.getTime() / 1000);
   const fajarJamatSecs = Math.floor(fajarJamatTime.getTime() / 1000);
+  const asrJamatSecs = Math.floor(asrJamatTime.getTime() / 1000);
+  const maghribJamatSecs = Math.floor(maghribJamatTime.getTime() / 1000);
+  const ishaJamatSecs = Math.floor(ishaJamatTime.getTime() / 1000);
 
   // Define prayer time ranges
   const prayerRanges = [
@@ -325,8 +375,18 @@ function getCurrentPrayer(
       end: prayerTimes.set.secs,
     },
     {
+      name: prayerNames[2] + " " + localize("jamat"), // Asr Jamat
+      start: asrJamatSecs,
+      end: prayerTimes.set.secs,
+    },
+    {
       name: prayerNames[3], // Maghrib
       start: prayerTimes.magrib12.secs,
+      end: prayerTimes.esha.secs,
+    },
+    {
+      name: prayerNames[3] + " " + localize("jamat"), // Maghrib Jamat
+      start: maghribJamatSecs,
       end: prayerTimes.esha.secs,
     },
     {
@@ -334,6 +394,11 @@ function getCurrentPrayer(
       start: prayerTimes.esha.secs,
       end: prayerTimes.fajar18.secs + 86400,
     }, // Add 24 hours for next day's Fajr
+    {
+      name: prayerNames[4] + " " + localize("jamat"), // Isha Jamat
+      start: ishaJamatSecs,
+      end: prayerTimes.fajar18.secs + 86400,
+    },
   ];
 
   // Find current prayer
@@ -398,13 +463,15 @@ function getCurrentPrayer(
   };
 }
 
-function scheduleJamatNotification(jamatTime: Date) {
+function scheduleJamatNotification(jamatTime: Date, prayerName: string) {
   const currentTime = new Date();
   const timeUntilJamat = jamatTime.getTime() - currentTime.getTime();
 
   if (timeUntilJamat > 0) {
     setTimeout(() => {
-      vscode.window.showInformationMessage(localize("timeForJamat"));
+      vscode.window.showInformationMessage(
+        `${localize("timeForJamat")} ${prayerName}`
+      );
     }, timeUntilJamat);
   }
 }
