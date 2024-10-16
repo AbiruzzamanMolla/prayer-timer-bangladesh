@@ -9,7 +9,8 @@ const CONFIG_KEY_LNG = "prayerTimerBangladesh.lng";
 const CONFIG_KEY_TZNAME = "prayerTimerBangladesh.tzname";
 const CONFIG_KEY_POSITION = "prayerTimerBangladesh.position";
 const CONFIG_KEY_ACTIVE = "prayerTimerBangladesh.active";
-const CONFIG_KEY_LANGUAGE = "prayerTimerBangladesh.language"; // New key for language selection
+const CONFIG_KEY_LANGUAGE = "prayerTimerBangladesh.language";
+const CONFIG_KEY_DHUHR_JAMAT = "prayerTimerBangladesh.dhuhrJamatMinutes";
 
 let prayerTimesStatusBar: vscode.StatusBarItem;
 let prayerAlarmTimeouts: NodeJS.Timeout[] = [];
@@ -184,6 +185,7 @@ async function fetchPrayerTimes(context: vscode.ExtensionContext) {
 
 function setPrayerData() {
   const prayerNames = localize("prayers");
+  const dhuhrJamatMinutes = vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_DHUHR_JAMAT) || 30;
 
   allPrayerTimes = [
     `${prayerTimes.fajar18.short}`,
@@ -193,12 +195,26 @@ function setPrayerData() {
     `${prayerTimes.esha.short}`,
   ];
 
+   const dhuhrJamatTime = new Date(
+     prayerTimes.noon.secs * 1000 + dhuhrJamatMinutes * 60 * 1000
+   );
+
+   const dhuhrJamatTimeString = dhuhrJamatTime.toLocaleTimeString([], {
+     hour: "2-digit",
+     minute: "2-digit",
+   });
+
+
   const isActive = vscode.workspace
     .getConfiguration()
     .get<boolean>(CONFIG_KEY_ACTIVE);
 
   if (isActive) {
-    const currentPrayer = getCurrentPrayer(prayerNames, allPrayerTimes);
+    const currentPrayer = getCurrentPrayer(
+      prayerNames,
+      allPrayerTimes,
+      dhuhrJamatTime
+    );
     if (currentPrayer) {
       updatePrayerTimesStatusBar(
         currentPrayer.name,
@@ -213,7 +229,11 @@ function setPrayerData() {
 
       // Set an interval to update the remaining time every minute
       updatePrayerTimesInterval = setInterval(() => {
-        const updatedPrayer = getCurrentPrayer(prayerNames, allPrayerTimes);
+        const updatedPrayer = getCurrentPrayer(
+          prayerNames,
+          allPrayerTimes,
+          dhuhrJamatTime
+        );
         if (updatedPrayer) {
           updatePrayerTimesStatusBar(
             updatedPrayer.name,
@@ -225,6 +245,7 @@ function setPrayerData() {
 
       setPrayerAlarms(allPrayerTimes); // Schedule the prayer alarms
       schedulePrayerHadithNotifications(allPrayerTimes); // Schedule hadith notifications
+      scheduleDhuhrJamatNotification(dhuhrJamatTime);
     }
   } else {
     prayerTimesStatusBar.hide(); // Hide if not active
@@ -247,6 +268,8 @@ function localize(key: string) {
       hadith: "Hadith",
       reference: "Reference",
       timeForPrayer: "It's time for",
+      dhuhrJamat: "Dhuhr Jamat",
+      timeForDhuhrJamat: "It's time for Dhuhr Jamat",
     },
     Bangla: {
       location: "অবস্থান",
@@ -258,15 +281,22 @@ function localize(key: string) {
       hadith: "হাদিস",
       reference: "উদ্ধৃতি",
       timeForPrayer: "নামাজের সময় হয়েছে",
+      dhuhrJamat: "যোহরের জামাত",
+      timeForDhuhrJamat: "যোহরের জামাতের সময় হয়েছে",
     },
   };
 
   return translations[language][key];
 }
 
-function getCurrentPrayer(prayerNames: string[], times: string[]) {
+function getCurrentPrayer(
+  prayerNames: string[],
+  times: string[],
+  dhuhrJamatTime: Date
+) {
   const currentTime = new Date();
   const currentSecs = Math.floor(currentTime.getTime() / 1000);
+  const dhuhrJamatSecs = Math.floor(dhuhrJamatTime.getTime() / 1000);
 
   // Define prayer time ranges
   const prayerRanges = [
@@ -278,6 +308,11 @@ function getCurrentPrayer(prayerNames: string[], times: string[]) {
     {
       name: prayerNames[1], // Dhuhr
       start: prayerTimes.noon.secs,
+      end: prayerTimes.asar2.secs,
+    },
+    {
+      name: localize("dhuhrJamat"), // Dhuhr Jamat
+      start: dhuhrJamatSecs,
       end: prayerTimes.asar2.secs,
     },
     {
@@ -357,6 +392,17 @@ function getCurrentPrayer(prayerNames: string[], times: string[]) {
     time: "N/A",
     remainingTime: "N/A",
   };
+}
+
+function scheduleDhuhrJamatNotification(dhuhrJamatTime: Date) {
+  const currentTime = new Date();
+  const timeUntilDhuhrJamat = dhuhrJamatTime.getTime() - currentTime.getTime();
+
+  if (timeUntilDhuhrJamat > 0) {
+    setTimeout(() => {
+      vscode.window.showInformationMessage(localize("timeForDhuhrJamat"));
+    }, timeUntilDhuhrJamat);
+  }
 }
 
 function schedulePrayerHadithNotifications(times: string[]) {
