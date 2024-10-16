@@ -208,11 +208,11 @@ function setPrayerData() {
   ];
 
   const dhuhrJamatTime = new Date(
-    prayerTimes.noon.secs * 1000 + dhuhrJamatMinutes * 60 * 1000
+    prayerTimes.noon.secs + 120 * 1000 + dhuhrJamatMinutes * 60 * 1000
   );
 
   const fajarJamatTime = new Date(
-    prayerTimes.noon.secs * 1000 + fajarJamatMinutes * 60 * 1000
+    prayerTimes.noon.secs + 120 * 1000 + fajarJamatMinutes * 60 * 1000
   );
 
   const asrJamatTime = new Date(
@@ -361,7 +361,7 @@ function getCurrentPrayer(
     },
     {
       name: prayerNames[1], // Dhuhr
-      start: prayerTimes.noon.secs,
+      start: prayerTimes.noon.secs + 120,
       end: prayerTimes.asar2.secs,
     },
     {
@@ -372,22 +372,22 @@ function getCurrentPrayer(
     {
       name: prayerNames[2], // Asr
       start: prayerTimes.asar2.secs,
-      end: prayerTimes.set.secs,
+      end: prayerTimes.set.secs - 300, // 5 minutes before sunset (300 seconds)
     },
     {
       name: prayerNames[2] + " " + localize("jamat"), // Asr Jamat
       start: asrJamatSecs,
-      end: prayerTimes.set.secs,
+      end: prayerTimes.set.secs - 300, // 5 minutes before sunset (300 seconds)
     },
     {
       name: prayerNames[3], // Maghrib
-      start: prayerTimes.magrib12.secs,
-      end: prayerTimes.esha.secs,
+      start: prayerTimes.set.secs + 120, // 2 minutes after sunset (120 seconds)
+      end: prayerTimes.magrib12.secs,
     },
     {
       name: prayerNames[3] + " " + localize("jamat"), // Maghrib Jamat
       start: maghribJamatSecs,
-      end: prayerTimes.esha.secs,
+      end: prayerTimes.magrib12.secs,
     },
     {
       name: prayerNames[4], // Isha
@@ -421,38 +421,31 @@ function getCurrentPrayer(
   // If no current prayer (between Fajr end and Dhuhr start, or between Asr end and Maghrib start)
   if (
     currentSecs >= prayerTimes.rise.secs &&
-    currentSecs < prayerTimes.noon.secs
+    currentSecs < prayerTimes.noon.secs + 120
   ) {
-    const remainingTime = prayerTimes.noon.secs - currentSecs;
-    const hours = Math.floor(remainingTime / 3600);
-    const minutes = Math.floor((remainingTime % 3600) / 60);
-    return {
-      name: `${localize("nextPrayer")}: ${prayerNames[1]}`,
-      time: new Date(prayerTimes.noon.secs * 1000).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      remainingTime: `${hours}h ${minutes}m ${localize("until")} ${
-        prayerNames[1]
-      }`,
-    };
+    return getNextPrayerInfo(
+      prayerNames[1],
+      prayerTimes.noon.secs + 120,
+      currentSecs
+    );
   } else if (
-    currentSecs >= prayerTimes.set.secs &&
-    currentSecs < prayerTimes.magrib12.secs
+    currentSecs >= prayerTimes.set.secs - 300 &&
+    currentSecs < prayerTimes.set.secs + 120
   ) {
-    const remainingTime = prayerTimes.magrib12.secs - currentSecs;
-    const hours = Math.floor(remainingTime / 3600);
-    const minutes = Math.floor((remainingTime % 3600) / 60);
-    return {
-      name: `${localize("nextPrayer")}: ${prayerNames[3]}`,
-      time: new Date(prayerTimes.magrib12.secs * 1000).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      remainingTime: `${hours}h ${minutes}m ${localize("until")} ${
-        prayerNames[3]
-      }`,
-    };
+    return getNextPrayerInfo(
+      prayerNames[3],
+      prayerTimes.set.secs + 120,
+      currentSecs
+    );
+  } else if (
+    currentSecs >= prayerTimes.magrib12.secs &&
+    currentSecs < prayerTimes.esha.secs
+  ) {
+    return getNextPrayerInfo(
+      prayerNames[4],
+      prayerTimes.esha.secs,
+      currentSecs
+    );
   }
 
   // This should never happen, but just in case
@@ -460,6 +453,24 @@ function getCurrentPrayer(
     name: "Unknown",
     time: "N/A",
     remainingTime: "N/A",
+  };
+}
+
+function getNextPrayerInfo(
+  prayerName: string,
+  prayerTime: number,
+  currentSecs: number
+) {
+  const remainingTime = prayerTime - currentSecs;
+  const hours = Math.floor(remainingTime / 3600);
+  const minutes = Math.floor((remainingTime % 3600) / 60);
+  return {
+    name: `${localize("nextPrayer")}: ${prayerName}`,
+    time: new Date(prayerTime * 1000).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    remainingTime: `${hours}h ${minutes}m ${localize("until")} ${prayerName}`,
   };
 }
 
@@ -498,7 +509,7 @@ function getPrayerTimeSecs(index: number): number {
     case 0:
       return prayerTimes.fajar18.secs;
     case 1:
-      return prayerTimes.noon.secs;
+      return prayerTimes.noon.secs + 120;
     case 2:
       return prayerTimes.asar2.secs;
     case 3:
@@ -540,14 +551,27 @@ function updatePrayerTimesStatusBar(
 function showAllPrayerTimes() {
   const locationName =
     locationInfo?.name || locationInfo?.location || localize("location");
+
+  const formatTime12h = (secs: number): string => {
+    const date = new Date(secs * 1000); // Convert seconds to milliseconds
+    const hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const seconds = date.getSeconds().toString().padStart(2, "0");
+    const amPm = hours < 12 ? "AM" : "PM";
+    const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+
+    return `${formattedHours}:${minutes}:${seconds} ${amPm}`;
+  };
+
   const message = `
     ${localize("location")}: ${locationName}
-    ${localize("prayers")[0]}: ${prayerTimes.fajar18.long}
-    ${localize("prayers")[1]}: ${prayerTimes.noon.long}
-    ${localize("prayers")[2]}: ${prayerTimes.asar2.long}
-    ${localize("prayers")[3]}: ${prayerTimes.set.long}
-    ${localize("prayers")[4]}: ${prayerTimes.esha.long}
+    ${localize("prayers")[0]}: ${formatTime12h(prayerTimes.fajar18.secs)}
+    ${localize("prayers")[1]}: ${formatTime12h(prayerTimes.noon.secs + 2*60)}
+    ${localize("prayers")[2]}: ${formatTime12h(prayerTimes.asar2.secs)}
+    ${localize("prayers")[3]}: ${formatTime12h(prayerTimes.set.secs + 2*60)}
+    ${localize("prayers")[4]}: ${formatTime12h(prayerTimes.esha.secs)}
   `;
+
   vscode.window.showInformationMessage(
     `${localize("prayerTimes")}:\n${message}`,
     { modal: true }
@@ -558,7 +582,7 @@ function setPrayerAlarms(times: string[]) {
   const prayerNames = localize("prayers");
   const alarmTimes = [
     { name: prayerNames[0], time: prayerTimes.fajar18.secs },
-    { name: prayerNames[1], time: prayerTimes.noon.secs },
+    { name: prayerNames[1], time: prayerTimes.noon.secs + 120 },
     { name: prayerNames[2], time: prayerTimes.asar2.secs },
     { name: prayerNames[3], time: prayerTimes.set.secs + 2 * 60 },
     { name: prayerNames[4], time: prayerTimes.esha.secs },

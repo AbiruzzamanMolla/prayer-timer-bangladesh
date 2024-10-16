@@ -4,6 +4,10 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 # Changelog
 
+## [1.0.7] - 2024-10-16
+### Fixed
+- All Prayer times issues
+
 ## [1.0.6] - 2024-10-16
 ### Fixed
 - Magrib Prayer Time issue
