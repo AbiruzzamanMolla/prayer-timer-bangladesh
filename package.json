@@ -92,10 +92,15 @@
           "default": true,
           "description": "Whether to show the prayer time in the status bar."
         },
-        "prayerTimerBangladesh.dhuhrJamatMinutes": {
+        "prayerTimerBangladesh.jamatFajarMinutes": {
           "type": "number",
-          "default": 45,
-          "description": "Minutes after Dhuhr prayer for Dhuhr Jamat"
+          "default": 40,
+          "description": "Add Minutes after Fajar prayer for Fajar Jamat"
+        },
+        "prayerTimerBangladesh.jamatDhuhrMinutes": {
+          "type": "number",
+          "default": 90,
+          "description": "Add Minutes after Dhuhr prayer for Dhuhr Jamat"
         }
       }
     }
