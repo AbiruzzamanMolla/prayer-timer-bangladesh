@@ -4,6 +4,11 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 # Changelog
 
+
+## [1.0.8] - 2024-10-17
+### Added
+- Added popup window notification for prayer.
+
 ## [1.0.7] - 2024-10-16
 ### Fixed
 - All Prayer times issues

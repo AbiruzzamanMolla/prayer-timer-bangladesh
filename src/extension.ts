@@ -24,6 +24,7 @@ let prayerTimes: any; // To store all prayer data
 let locationInfo: any; // To store location data
 let hadiths: any[] = []; // To store hadiths
 let updatePrayerTimesInterval: NodeJS.Timeout;
+let currentWebviewPanel: vscode.WebviewPanel | undefined;
 
 // Keys to store prayer times and location info in global state
 const PRAYER_TIMES_KEY = "prayerTimesBangladesh";
@@ -598,11 +599,86 @@ function setPrayerAlarms(times: string[]) {
         vscode.window.showInformationMessage(
           `${localize("timeForPrayer")} ${alarm.name}!`
         );
+        showPrayerAlarmPopup(alarm.name);
       }, timeUntilAlarm * 1000);
 
       prayerAlarmTimeouts.push(timeout);
     }
   });
+}
+
+function showPrayerAlarmPopup(prayerName: string) {
+  if (currentWebviewPanel) {
+    currentWebviewPanel.reveal(vscode.ViewColumn.One);
+  } else {
+    currentWebviewPanel = vscode.window.createWebviewPanel(
+      "prayerAlarm", // Identifies the type of the webview. Used internally
+      "Prayer Time Alert", // Title of the panel displayed to the user
+      vscode.ViewColumn.One, // Editor column to show the new webview panel in
+      {
+        enableScripts: true, // Enable JavaScript in the webview
+      }
+    );
+
+    // Set the HTML content for the webview
+    currentWebviewPanel.webview.html = getWebviewContent(prayerName);
+
+    // Handle the disposal of the panel
+    currentWebviewPanel.onDidDispose(() => {
+      currentWebviewPanel = undefined;
+    });
+  }
+}
+
+function getWebviewContent(prayerName: string): string {
+  return `<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Prayer Alarm</title>   
+
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #fff3cd;
+                color: #856404;
+                padding: 20px;
+                border: 1px solid #ffeeba;
+                border-radius: 5px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+            h1 {
+                font-size: 36px;
+                margin: 0;
+            }
+            .btn {
+                background-color: #856404;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            .btn:hover {
+                background-color: #705c2c;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>It's time for ${prayerName}!</h1>
+        <button class="btn" onclick="closeWindow()">Close</button>
+        <script>
+            const vscode = acquireVsCodeApi();
+            function closeWindow() {
+                vscode.postMessage({ command: 'close' });
+            }
+        </script>
+    </body>
+</html>`;
 }
 
 function loadHadiths() {
