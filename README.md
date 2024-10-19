@@ -26,8 +26,9 @@
 - **Notifications**
   - Prayer Timer Notification
   ![Prayer Timer Notification](./screenshots/prayer-notifications.png)
+
   ![Prayer Timer Notification](./screenshots/prayer-notifications-fullpage.png)
-  
+
   - Hadith Notification
   ![Prayer Timer Notification](./screenshots/hadith-notification.png)
   
