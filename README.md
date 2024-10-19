@@ -33,6 +33,10 @@
   ![Prayer Timer Bangladesh Icon](./screenshots/show-all-times-en.png)
   ![Prayer Timer Bangladesh Icon - Bangla](./screenshots/show-all-times-bn.png)
 
+- **Islamic Foundation Bangladesh Prayer Timer**: By runing the command `Show Today's Islamic Foundation Prayer Timer` you can see todays prayer time given by islamic foundation.
+
+  ![ইসলামিক ফাউন্ডেশন নামাজের সময় সূচি](./screenshots/ifb-timer.png)
+
 ## Installation
 
 1. **Install via Marketplace**:
