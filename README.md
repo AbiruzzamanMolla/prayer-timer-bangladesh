@@ -25,12 +25,11 @@
 
 - **Notifications**
   - Prayer Timer Notification
-  ![Prayer Timer Notification](./screenshots/prayer-notifications.png)
-
-  ![Prayer Timer Notification](./screenshots/prayer-notifications-fullpage.png)
+  - ![Prayer Timer Notification](./screenshots/prayer-notifications.png)
+  - ![Prayer Timer Notification](./screenshots/prayer-notifications-fullpage.png)
 
   - Hadith Notification
-  ![Prayer Timer Notification](./screenshots/hadith-notification.png)
+  - ![Prayer Timer Notification](./screenshots/hadith-notification.png)
   
 - **Status Bar Integration**: Seamlessly displays the current prayer time in the status bar without disrupting your workflow.
 
