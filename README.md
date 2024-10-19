@@ -22,6 +22,14 @@
   - `Show All Prayer Times`: Displays all prayer times in a list.
 
   ![Prayer Timer Bangladesh Icon](./screenshots/commands.png)
+
+- **Notifications**
+  - Prayer Timer Notification
+  ![Prayer Timer Notification](./screenshots/prayer-notifications.png)
+  ![Prayer Timer Notification](./screenshots/prayer-notifications-fullpage.png)
+  
+  - Hadith Notification
+  ![Prayer Timer Notification](./screenshots/hadith-notification.png)
   
 - **Status Bar Integration**: Seamlessly displays the current prayer time in the status bar without disrupting your workflow.
 
@@ -86,6 +94,11 @@
 - **Clean Prayer Timer from Memory**:
   - Command: `prayer-timer-bangladesh.resetPrayerTimes`
   - Description: Clears the stored prayer times and location information from memory and resets the timer.
+
+  
+- **Show Islamic Foundation Prayer Time**:
+  - Command: `prayer-timer-bangladesh.showBdPrayerTimes`
+  - Description: Show today's islamic foundation local (dhaka) prayer timer.
 
 ### Configuration
 
