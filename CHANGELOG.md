@@ -4,6 +4,14 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 # Changelog
 
+## [1.1.0] - 2024-10-19
+### Fixed
+- Fixed Bootstrap design for IFB table
+
+## [1.0.9] - 2024-10-19
+### Added
+- Added Islamic Foundation Prayer Timer
+
 
 ## [1.0.8] - 2024-10-17
 ### Added

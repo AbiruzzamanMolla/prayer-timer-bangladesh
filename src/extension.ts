@@ -91,17 +91,67 @@ function nt_getPrayerTimesHtml(prayerTimes: any): string {
     const forbiddenBeforeMaghribStart = nt_addMinutes(prayerTimes.magribStartHour, prayerTimes.magribStartMinute, FORBIDDEN_TIME_START_BEFORE_MAGHRIB_IN_MINUTE);
 
     return `
-    <table>
-        <tr><td>সাহরীর শেষ সময়</td><td id="sahri-end">${nt_formatTime(prayerTimes.sahriEndHour, prayerTimes.sahriEndMinute)}</td></tr>
-        <tr><td>ফজর শুরু</td><td id="fajr-start">${nt_formatTime(fajrStart.hour, fajrStart.minute)}</td></tr>
-        <tr><td>সূর্যোদয় ও নামাজের নিষিদ্ধ সময়</td><td id="sunrise-forbidden">${nt_formatTime(prayerTimes.sunriseHour, prayerTimes.sunriseMinute)} - ${nt_formatTime(forbiddenAfterSunriseEnd.hour, forbiddenAfterSunriseEnd.minute)}</td></tr>
-        <tr><td>যোহর শুরু</td><td id="duhr-start">${nt_formatTime(prayerTimes.noonHour, prayerTimes.noonMinute)}</td></tr>
-        <tr><td>দ্বিপ্রহর ও নামাজের নিষিদ্ধ সময়</td><td id="noon-forbidden">${nt_formatTime(forbiddenBeforeNoonStart.hour, forbiddenBeforeNoonStart.minute)} - ${nt_formatTime(forbiddenAfterNoonEnd.hour, forbiddenAfterNoonEnd.minute)}</td></tr>
-        <tr><td>আসর শুরু</td><td id="asr-start">${nt_formatTime(prayerTimes.asrStartHour, prayerTimes.asrStartMinute)}</td></tr>
-        <tr><td>সূর্যাস্ত ও নামাজের নিষিদ্ধ সময় (ঐ দিনের আসর ব্যতীত)</td><td id="sunset-forbidden">${nt_formatTime(forbiddenBeforeMaghribStart.hour, forbiddenBeforeMaghribStart.minute)} - ${nt_formatTime(sunsetBeforeMaghrib.hour, sunsetBeforeMaghrib.minute)}</td></tr>
-        <tr><td>মাগরিব শুরু</td><td id="magrib-start">${nt_formatTime(prayerTimes.magribStartHour, prayerTimes.magribStartMinute)}</td></tr>
-        <tr><td>এশা শুরু</td><td id="isha-start">${nt_formatTime(prayerTimes.ishaStartHour, prayerTimes.ishaStartMinute)}</td></tr>
-    </table>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">ইসলামিক ফাউন্ডেশনের নামাজের সময় (ঢাকা - ${new Date().getDate()}/${
+      new Date().getMonth() + 1
+    }/${new Date().getFullYear()})</h2>
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Prayer</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>সাহরীর শেষ সময়</td><td id="sahri-end">${nt_formatTime(
+                  prayerTimes.sahriEndHour,
+                  prayerTimes.sahriEndMinute
+                )}</td></tr>
+                <tr><td>ফজর শুরু</td><td id="fajr-start">${nt_formatTime(
+                  fajrStart.hour,
+                  fajrStart.minute
+                )}</td></tr>
+                <tr><td>সূর্যোদয় ও নামাজের নিষিদ্ধ সময়</td><td id="sunrise-forbidden">${nt_formatTime(
+                  prayerTimes.sunriseHour,
+                  prayerTimes.sunriseMinute
+                )} - ${nt_formatTime(
+      forbiddenAfterSunriseEnd.hour,
+      forbiddenAfterSunriseEnd.minute
+    )}</td></tr>
+                <tr><td>যোহর শুরু</td><td id="duhr-start">${nt_formatTime(
+                  prayerTimes.noonHour,
+                  prayerTimes.noonMinute
+                )}</td></tr>
+                <tr><td>দ্বিপ্রহর ও নামাজের নিষিদ্ধ সময়</td><td id="noon-forbidden">${nt_formatTime(
+                  forbiddenBeforeNoonStart.hour,
+                  forbiddenBeforeNoonStart.minute
+                )} - ${nt_formatTime(
+      forbiddenAfterNoonEnd.hour,
+      forbiddenAfterNoonEnd.minute
+    )}</td></tr>
+                <tr><td>আসর শুরু</td><td id="asr-start">${nt_formatTime(
+                  prayerTimes.asrStartHour,
+                  prayerTimes.asrStartMinute
+                )}</td></tr>
+                <tr><td>সূর্যাস্ত ও নামাজের নিষিদ্ধ সময়</td><td id="sunset-forbidden">${nt_formatTime(
+                  forbiddenBeforeMaghribStart.hour,
+                  forbiddenBeforeMaghribStart.minute
+                )} - ${nt_formatTime(
+      sunsetBeforeMaghrib.hour,
+      sunsetBeforeMaghrib.minute
+    )}</td></tr>
+                <tr><td>মাগরিব শুরু</td><td id="magrib-start">${nt_formatTime(
+                  prayerTimes.magribStartHour,
+                  prayerTimes.magribStartMinute
+                )}</td></tr>
+                <tr><td>এশা শুরু</td><td id="isha-start">${nt_formatTime(
+                  prayerTimes.ishaStartHour,
+                  prayerTimes.ishaStartMinute
+                )}</td></tr>
+            </tbody>
+        </table>
+    </div>
     `;
 }
 
