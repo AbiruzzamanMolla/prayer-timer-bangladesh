@@ -35,6 +35,80 @@ const CLEAN_INTERVAL_HOURS = 12 * 60 * 60 * 1000; // 12 hours in milliseconds
 // Store previous config for comparison
 let previousConfig: vscode.WorkspaceConfiguration | undefined;
 
+
+/*
+New Timer from Islamic Foundation
+*/
+
+// Time adjustment constants
+const FAJR_START_AFTER_SAHRI_IN_MINUTE = 5;
+const FORBIDDEN_TIME_END_AFTER_SUNRISE_IN_MINUTE = 10;
+const FORBIDDEN_TIME_START_BEFORE_NOON_IN_MINUTE = -3;
+const FORBIDDEN_TIME_END_AFTER_NOON_IN_MINUTE = 3;
+const FORBIDDEN_TIME_START_BEFORE_MAGHRIB_IN_MINUTE = -13;
+const SUNSET_TIME_BEFORE_MAGHRIB_IN_MINUTE = -3;
+
+// Function to add minutes to time and adjust the hour and minute accordingly
+function nt_addMinutes(hour: number, minute: number, additionalMinutes: number): { hour: number, minute: number } {
+    let totalMinutes = hour * 60 + minute + additionalMinutes;
+    let adjustedHour = Math.floor(totalMinutes / 60) % 24;
+    let adjustedMinute = totalMinutes % 60;
+
+    return { hour: adjustedHour, minute: adjustedMinute };
+}
+
+// Function to format time in 12-hour format with am/pm
+function nt_formatTime(hour: number, minute: number): string {
+    const period = hour >= 12 ? 'pm' : 'am';
+    const adjustedHour = hour % 12 === 0 ? 12 : hour % 12;
+    const formattedMinute = minute < 10 ? `0${minute}` : minute;
+    return `${adjustedHour}:${formattedMinute}${period}`;
+}
+
+// Function to get today's prayer times from JSON
+function nt_getTodaysPrayerTimes(): any {
+    const timetablePath = path.join(__dirname, "..", "timetable.json");
+    const timetable = JSON.parse(fs.readFileSync(timetablePath, 'utf8'));
+
+    const today = new Date();
+    const todayMonth = today.getMonth() + 1;  // getMonth() is zero-indexed
+    const todayDay = today.getDate();
+
+    return timetable.find((item: any) => item.month === todayMonth && item.day === todayDay);
+}
+
+// Function to generate HTML for displaying the prayer times
+function nt_getPrayerTimesHtml(prayerTimes: any): string {
+    if (!prayerTimes) {
+        return '<h3>Prayer times not found for today.</h3>';
+    }
+
+    const fajrStart = nt_addMinutes(prayerTimes.sahriEndHour, prayerTimes.sahriEndMinute, FAJR_START_AFTER_SAHRI_IN_MINUTE);
+    const forbiddenAfterSunriseEnd = nt_addMinutes(prayerTimes.sunriseHour, prayerTimes.sunriseMinute, FORBIDDEN_TIME_END_AFTER_SUNRISE_IN_MINUTE);
+    const forbiddenBeforeNoonStart = nt_addMinutes(prayerTimes.noonHour, prayerTimes.noonMinute, FORBIDDEN_TIME_START_BEFORE_NOON_IN_MINUTE);
+    const forbiddenAfterNoonEnd = nt_addMinutes(prayerTimes.noonHour, prayerTimes.noonMinute, FORBIDDEN_TIME_END_AFTER_NOON_IN_MINUTE);
+    const sunsetBeforeMaghrib = nt_addMinutes(prayerTimes.magribStartHour, prayerTimes.magribStartMinute, SUNSET_TIME_BEFORE_MAGHRIB_IN_MINUTE);
+    const forbiddenBeforeMaghribStart = nt_addMinutes(prayerTimes.magribStartHour, prayerTimes.magribStartMinute, FORBIDDEN_TIME_START_BEFORE_MAGHRIB_IN_MINUTE);
+
+    return `
+    <table>
+        <tr><td>সাহরীর শেষ সময়</td><td id="sahri-end">${nt_formatTime(prayerTimes.sahriEndHour, prayerTimes.sahriEndMinute)}</td></tr>
+        <tr><td>ফজর শুরু</td><td id="fajr-start">${nt_formatTime(fajrStart.hour, fajrStart.minute)}</td></tr>
+        <tr><td>সূর্যোদয় ও নামাজের নিষিদ্ধ সময়</td><td id="sunrise-forbidden">${nt_formatTime(prayerTimes.sunriseHour, prayerTimes.sunriseMinute)} - ${nt_formatTime(forbiddenAfterSunriseEnd.hour, forbiddenAfterSunriseEnd.minute)}</td></tr>
+        <tr><td>যোহর শুরু</td><td id="duhr-start">${nt_formatTime(prayerTimes.noonHour, prayerTimes.noonMinute)}</td></tr>
+        <tr><td>দ্বিপ্রহর ও নামাজের নিষিদ্ধ সময়</td><td id="noon-forbidden">${nt_formatTime(forbiddenBeforeNoonStart.hour, forbiddenBeforeNoonStart.minute)} - ${nt_formatTime(forbiddenAfterNoonEnd.hour, forbiddenAfterNoonEnd.minute)}</td></tr>
+        <tr><td>আসর শুরু</td><td id="asr-start">${nt_formatTime(prayerTimes.asrStartHour, prayerTimes.asrStartMinute)}</td></tr>
+        <tr><td>সূর্যাস্ত ও নামাজের নিষিদ্ধ সময় (ঐ দিনের আসর ব্যতীত)</td><td id="sunset-forbidden">${nt_formatTime(forbiddenBeforeMaghribStart.hour, forbiddenBeforeMaghribStart.minute)} - ${nt_formatTime(sunsetBeforeMaghrib.hour, sunsetBeforeMaghrib.minute)}</td></tr>
+        <tr><td>মাগরিব শুরু</td><td id="magrib-start">${nt_formatTime(prayerTimes.magribStartHour, prayerTimes.magribStartMinute)}</td></tr>
+        <tr><td>এশা শুরু</td><td id="isha-start">${nt_formatTime(prayerTimes.ishaStartHour, prayerTimes.ishaStartMinute)}</td></tr>
+    </table>
+    `;
+}
+
+/*
+New Timer from Islamic Foundation ends
+*/
+
 export function activate(context: vscode.ExtensionContext) {
   // Check if it's time to clean local storage
   const lastClean = context.globalState.get<number>(LAST_CLEAN_KEY);
@@ -117,6 +191,34 @@ export function activate(context: vscode.ExtensionContext) {
     100
   );
   context.subscriptions.push(prayerTimesStatusBar);
+
+  /* register new timer from ifaba */
+
+  let bdTimer = vscode.commands.registerCommand(
+    "extension.showBdPrayerTimes",
+    () => {
+      // Get today's prayer times
+      const prayerTimes = nt_getTodaysPrayerTimes();
+
+      console.log(prayerTimes);
+      
+
+      // Create and show the Webview panel
+      const panel = vscode.window.createWebviewPanel(
+        "prayerTimes", // Identifies the type of the webview. Used internally
+        "Bangladesh Prayer Times", // Title of the panel displayed to the user
+        vscode.ViewColumn.One, // Editor column to show the new webview panel in.
+        {} // Webview options. More on these later.
+      );
+
+      // Set the webview's HTML content
+      panel.webview.html = nt_getPrayerTimesHtml(prayerTimes);
+    }
+  );
+
+  context.subscriptions.push(bdTimer);
+
+  /* ends new timer from ifaba */
 
   vscode.commands.executeCommand("prayer-timer-bangladesh.showPrayerTimes");
 }
