@@ -137,56 +137,70 @@ function nt_getPrayerTimesHtml(
   };
 
   const getJamatTime = (prayer:string): string => {
+    // Get configuration values with defaults
+    const fajarJamatMinutes =
+      vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_FAJAR_JAMAT) ||
+      30;
+    const dhuhrJamatMinutes =
+      vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_DHUHR_JAMAT) ||
+      30;
+    const asrJamatMinutes =
+      vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_ASR_JAMAT) ||
+      45;
+    const maghribJamatMinutes =
+      vscode.workspace
+        .getConfiguration()
+        .get<number>(CONFIG_KEY_MAGHRIB_JAMAT) || 30;
+    const ishaJamatMinutes =
+      vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_ISHA_JAMAT) ||
+      60;
 
-      const fajarJamatMinutes =
-        vscode.workspace
-          .getConfiguration()
-          .get<number>(CONFIG_KEY_FAJAR_JAMAT) || 30;
+    // Calculate the jamat times
+    const dhuhrJamatTime = apiPrayerTimes.noon.secs + dhuhrJamatMinutes * 60; // Add jamat time in seconds
+    const fajarJamatTime = apiPrayerTimes.fajar18.secs + fajarJamatMinutes * 60; // Corrected reference for Fajr
+    const asrJamatTime = apiPrayerTimes.asar2.secs + asrJamatMinutes * 60; // Ensure seconds are handled correctly
+    const maghribJamatTime =
+      apiPrayerTimes.magrib12.secs + maghribJamatMinutes * 60; // Ensure seconds are handled correctly
+    const ishaJamatTime = apiPrayerTimes.esha.secs + ishaJamatMinutes * 60; // Ensure seconds are handled correctly
 
-      const dhuhrJamatMinutes =
-        vscode.workspace
-          .getConfiguration()
-          .get<number>(CONFIG_KEY_DHUHR_JAMAT) || 30;
+    // Example function to format the timestamp to a readable time format
+    function formatTimeFromSeconds(totalSeconds: number) {
+      const date = new Date(totalSeconds * 1000);
 
-      const asrJamatMinutes =
-        vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_ASR_JAMAT) ||
-        45;
-      const maghribJamatMinutes =
-        vscode.workspace
-          .getConfiguration()
-          .get<number>(CONFIG_KEY_MAGHRIB_JAMAT) || 30;
-      const ishaJamatMinutes =
-        vscode.workspace
-          .getConfiguration()
-          .get<number>(CONFIG_KEY_ISHA_JAMAT) || 60;
+      enum Language {
+        English = "en-US",
+        Bangla = "bn-BD",
+      };
 
+      let lang;
+      const language = vscode.workspace.getConfiguration().get<string>(CONFIG_KEY_LANGUAGE) || "English";
 
-      const dhuhrJamatTime = apiPrayerTimes.noon.secs + 120 * 1000 + dhuhrJamatMinutes * 60 * 1000;
-
-      const fajarJamatTime = apiPrayerTimes.noon.secs + 120 * 1000 + fajarJamatMinutes * 60 * 1000;
-
-      const asrJamatTime = apiPrayerTimes.asar2.secs * 1000 + asrJamatMinutes * 60 * 1000;
-
-      const maghribJamatTime = apiPrayerTimes.magrib12.secs * 1000 + maghribJamatMinutes * 60 * 1000;
-
-      const ishaJamatTime = apiPrayerTimes.esha.secs * 1000 + ishaJamatMinutes * 60 * 1000;
-
-    let time;
+      if (language === "Bangla") {
+        lang = Language.Bangla;
+      } else {
+        lang = Language.English;
+      }
+      
+      return date.toLocaleTimeString(lang, {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      });
+    }
 
     if (prayer === "fajar18") {
-      time = fajarJamatTime;
-    } else if(prayer === "noon"){
-      time = dhuhrJamatTime;
-    } else if(prayer === "asar2"){
-      time = asrJamatTime;
-    } else if(prayer === "set"){
-      time = maghribJamatTime;
-    } else if(prayer === "esha"){
-      time = ishaJamatTime;
+      return formatTimeFromSeconds(fajarJamatTime);
+    } else if (prayer === "noon") {
+      return formatTimeFromSeconds(dhuhrJamatTime);
+    } else if (prayer === "asar2") {
+      return formatTimeFromSeconds(asrJamatTime);
+    } else if (prayer === "set") {
+      return formatTimeFromSeconds(maghribJamatTime);
+    } else if (prayer === "esha") {
+      return formatTimeFromSeconds(ishaJamatTime);
     }
-    console.log(time);
-    
-    return formatTime12h(time);
+
+    return '';
   };
 
   const bootstrapCssPath = nt_getBootstrapCssPath(webview);
