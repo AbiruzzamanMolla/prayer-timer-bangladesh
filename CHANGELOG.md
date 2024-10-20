@@ -4,6 +4,9 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 # Changelog
 
+## [1.1.3] - 2024-10-20
+### Added
+- Show Jamat time in all prayer time table
 
 ## [1.1.2] - 2024-10-20
 ### Added

@@ -136,118 +136,227 @@ function nt_getPrayerTimesHtml(
     return `${formattedHours}:${minutes}:${seconds} ${amPm}`;
   };
 
+  const getJamatTime = (prayer:string): string => {
+
+      const fajarJamatMinutes =
+        vscode.workspace
+          .getConfiguration()
+          .get<number>(CONFIG_KEY_FAJAR_JAMAT) || 30;
+
+      const dhuhrJamatMinutes =
+        vscode.workspace
+          .getConfiguration()
+          .get<number>(CONFIG_KEY_DHUHR_JAMAT) || 30;
+
+      const asrJamatMinutes =
+        vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_ASR_JAMAT) ||
+        45;
+      const maghribJamatMinutes =
+        vscode.workspace
+          .getConfiguration()
+          .get<number>(CONFIG_KEY_MAGHRIB_JAMAT) || 30;
+      const ishaJamatMinutes =
+        vscode.workspace
+          .getConfiguration()
+          .get<number>(CONFIG_KEY_ISHA_JAMAT) || 60;
+
+
+      const dhuhrJamatTime = apiPrayerTimes.noon.secs + 120 * 1000 + dhuhrJamatMinutes * 60 * 1000;
+
+      const fajarJamatTime = apiPrayerTimes.noon.secs + 120 * 1000 + fajarJamatMinutes * 60 * 1000;
+
+      const asrJamatTime = apiPrayerTimes.asar2.secs * 1000 + asrJamatMinutes * 60 * 1000;
+
+      const maghribJamatTime = apiPrayerTimes.magrib12.secs * 1000 + maghribJamatMinutes * 60 * 1000;
+
+      const ishaJamatTime = apiPrayerTimes.esha.secs * 1000 + ishaJamatMinutes * 60 * 1000;
+
+    let time;
+
+    if (prayer === "fajar18") {
+      time = fajarJamatTime;
+    } else if(prayer === "noon"){
+      time = dhuhrJamatTime;
+    } else if(prayer === "asar2"){
+      time = asrJamatTime;
+    } else if(prayer === "set"){
+      time = maghribJamatTime;
+    } else if(prayer === "esha"){
+      time = ishaJamatTime;
+    }
+    console.log(time);
+    
+    return formatTime12h(time);
+  };
+
   const bootstrapCssPath = nt_getBootstrapCssPath(webview);
 
   const locationName =
     locationInfo?.name || locationInfo?.location || localize("location");
-  const showAllPrayerTimesTable = `
-        <h2 class="text-center my-3">${localize(
-          "prayerTimes"
-        )}: ${locationName}</h2>
-        <table class="table table-bordered table-striped">
-            <thead class="thead-dark">
-                <tr>
-                    <th>${localize("waktu")}</th>
-                    <th>${localize("time")}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>${localize("prayers")[0]}</td><td>${formatTime12h(
-    apiPrayerTimes.fajar18.secs
-  )}</td></tr>
-                          <tr><td>${
-                            localize("prayers")[1]
-                          }</td><td>${formatTime12h(
-    apiPrayerTimes.noon.secs + 2 * 60
-  )}</td></tr>
-                          <tr><td>${
-                            localize("prayers")[2]
-                          }</td><td>${formatTime12h(
-    apiPrayerTimes.asar2.secs
-  )}</td></tr>
-                          <tr><td>${
-                            localize("prayers")[3]
-                          }</td><td>${formatTime12h(
-    apiPrayerTimes.set.secs + 2 * 60
-  )}</td></tr>
-                          <tr><td>${
-                            localize("prayers")[4]
-                          }</td><td>${formatTime12h(
-    apiPrayerTimes.esha.secs
-  )}</td></tr>
-            </tbody>
-        </table>
-    `;
 
   return `
     <link rel="stylesheet" href="${bootstrapCssPath}">
     <div class="container mt-4">
-    <div class="row">
-    <div class="col-md-6">
-        <h2 class="text-center mb-4">${localize("prayerTimes")}: (${localize(
-    "ifb"
-  )} ${localize("dhaka")} - ${new Date().getDate()}/${
+        <div class="row">
+            <div class="col-md-6 d-flex">
+                <div class="card flex-fill">
+                    <div class="card-header">
+                      <h2 class="text-center mb-4">${localize(
+                        "prayerTimes"
+                      )}: (${localize("ifb")} ${localize(
+    "dhaka"
+  )} - ${new Date().getDate()}/${
     new Date().getMonth() + 1
   }/${new Date().getFullYear()})</h2>
-        <table class="table table-bordered table-striped">
-            <thead class="thead-dark">
-                <tr>
-                    <th>${localize("waktu")}</th>
-                    <th>${localize("time")}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td>সাহরীর শেষ সময়</td><td id="sahri-end">${nt_formatTime(
-                  prayerTimes.sahriEndHour,
-                  prayerTimes.sahriEndMinute
-                )}</td></tr>
-                <tr><td>ফজর শুরু</td><td id="fajr-start">${nt_formatTime(
-                  fajrStart.hour,
-                  fajrStart.minute
-                )}</td></tr>
-                <tr><td>সূর্যোদয় ও নামাজের নিষিদ্ধ সময়</td><td id="sunrise-forbidden">${nt_formatTime(
-                  prayerTimes.sunriseHour,
-                  prayerTimes.sunriseMinute
-                )} - ${nt_formatTime(
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>${localize("waktu")}</th>
+                                    <th>${localize("time")}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>সাহরীর শেষ সময়</td>
+                                    <td id="sahri-end">${nt_formatTime(
+                                      prayerTimes.sahriEndHour,
+                                      prayerTimes.sahriEndMinute
+                                    )}</td>
+                                </tr>
+                                <tr>
+                                    <td>ফজর শুরু</td>
+                                    <td id="fajr-start">${nt_formatTime(
+                                      fajrStart.hour,
+                                      fajrStart.minute
+                                    )}</td>
+                                </tr>
+                                <tr>
+                                    <td>সূর্যোদয় ও নামাজের নিষিদ্ধ সময়</td>
+                                    <td id="sunrise-forbidden">${nt_formatTime(
+                                      prayerTimes.sunriseHour,
+                                      prayerTimes.sunriseMinute
+                                    )} - ${nt_formatTime(
     forbiddenAfterSunriseEnd.hour,
     forbiddenAfterSunriseEnd.minute
-  )}</td></tr>
-                <tr><td>যোহর শুরু</td><td id="duhr-start">${nt_formatTime(
-                  prayerTimes.noonHour,
-                  prayerTimes.noonMinute
-                )}</td></tr>
-                <tr><td>দ্বিপ্রহর ও নামাজের নিষিদ্ধ সময়</td><td id="noon-forbidden">${nt_formatTime(
-                  forbiddenBeforeNoonStart.hour,
-                  forbiddenBeforeNoonStart.minute
-                )} - ${nt_formatTime(
+  )}</td>
+                                </tr>
+                                <tr>
+                                    <td>যোহর শুরু</td>
+                                    <td id="duhr-start">${nt_formatTime(
+                                      prayerTimes.noonHour,
+                                      prayerTimes.noonMinute
+                                    )}</td>
+                                </tr>
+                                <tr>
+                                    <td>দ্বিপ্রহর ও নামাজের নিষিদ্ধ সময়</td>
+                                    <td id="noon-forbidden">${nt_formatTime(
+                                      forbiddenBeforeNoonStart.hour,
+                                      forbiddenBeforeNoonStart.minute
+                                    )} - ${nt_formatTime(
     forbiddenAfterNoonEnd.hour,
     forbiddenAfterNoonEnd.minute
-  )}</td></tr>
-                <tr><td>আসর শুরু</td><td id="asr-start">${nt_formatTime(
-                  prayerTimes.asrStartHour,
-                  prayerTimes.asrStartMinute
-                )}</td></tr>
-                <tr><td>সূর্যাস্ত ও নামাজের নিষিদ্ধ সময়</td><td id="sunset-forbidden">${nt_formatTime(
-                  forbiddenBeforeMaghribStart.hour,
-                  forbiddenBeforeMaghribStart.minute
-                )} - ${nt_formatTime(
+  )}</td>
+                                </tr>
+                                <tr>
+                                    <td>আসর শুরু</td>
+                                    <td id="asr-start">${nt_formatTime(
+                                      prayerTimes.asrStartHour,
+                                      prayerTimes.asrStartMinute
+                                    )}</td>
+                                </tr>
+                                <tr>
+                                    <td>সূর্যাস্ত ও নামাজের নিষিদ্ধ সময়</td>
+                                    <td id="sunset-forbidden">${nt_formatTime(
+                                      forbiddenBeforeMaghribStart.hour,
+                                      forbiddenBeforeMaghribStart.minute
+                                    )} - ${nt_formatTime(
     sunsetBeforeMaghrib.hour,
     sunsetBeforeMaghrib.minute
-  )}</td></tr>
-                <tr><td>মাগরিব শুরু</td><td id="magrib-start">${nt_formatTime(
-                  prayerTimes.magribStartHour,
-                  prayerTimes.magribStartMinute
-                )}</td></tr>
-                <tr><td>এশা শুরু</td><td id="isha-start">${nt_formatTime(
-                  prayerTimes.ishaStartHour,
-                  prayerTimes.ishaStartMinute
-                )}</td></tr>
-            </tbody>
-        </table>
-        </div>
-        <div class="col-md-6">
-        ${showAllPrayerTimesTable} <!-- New Table -->
-        </div>
+  )}</td>
+                                </tr>
+                                <tr>
+                                    <td>মাগরিব শুরু</td>
+                                    <td id="magrib-start">${nt_formatTime(
+                                      prayerTimes.magribStartHour,
+                                      prayerTimes.magribStartMinute
+                                    )}</td>
+                                </tr>
+                                <tr>
+                                    <td>এশা শুরু</td>
+                                    <td id="isha-start">${nt_formatTime(
+                                      prayerTimes.ishaStartHour,
+                                      prayerTimes.ishaStartMinute
+                                    )}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 d-flex">
+                <div class="card flex-fill">
+                    <div class="card-header">
+                          <h2 class="text-center my-3">${localize(
+                            "prayerTimes"
+                          )}: ${locationName}</h2>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>${localize("waktu")}</th>
+                                    <th>${localize("time")}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>${localize("prayers")[0]}</td>
+                                    <td>${formatTime12h(
+                                      apiPrayerTimes.fajar18.secs
+                                    )} (${localize("jamat")}: ${getJamatTime(
+    "fajar18"
+  )})</td>
+                                </tr>
+                                <tr>
+                                    <td>${localize("prayers")[1]}</td>
+                                    <td>${formatTime12h(
+                                      apiPrayerTimes.noon.secs + 2 * 60
+                                    )} (${localize("jamat")}: ${getJamatTime(
+    "noon"
+  )})</td>
+                                </tr>
+                                <tr>
+                                    <td>${localize("prayers")[2]}</td>
+                                    <td>${formatTime12h(
+                                      apiPrayerTimes.asar2.secs
+                                    )} (${localize("jamat")}: ${getJamatTime(
+    "asar2"
+  )})</td>
+                                </tr>
+                                <tr>
+                                    <td>${localize("prayers")[3]}</td>
+                                    <td>${formatTime12h(
+                                      apiPrayerTimes.set.secs + 2 * 60
+                                    )} (${localize("jamat")}: ${getJamatTime(
+    "set"
+  )})</td>
+                                </tr>
+                                <tr>
+                                    <td>${localize("prayers")[4]}</td>
+                                    <td>${formatTime12h(
+                                      apiPrayerTimes.esha.secs
+                                    )} (${localize("jamat")}: ${getJamatTime(
+    "esha"
+  )})</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     `;
