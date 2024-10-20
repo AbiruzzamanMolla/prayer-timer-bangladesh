@@ -21,6 +21,7 @@ let prayerTimesStatusBar: vscode.StatusBarItem;
 let prayerAlarmTimeouts: NodeJS.Timeout[] = [];
 let allPrayerTimes: string[] = []; // To store all prayer times
 let prayerTimes: any; // To store all prayer data
+let apiPrayerTimes: any; // To store all prayer data
 let locationInfo: any; // To store location data
 let hadiths: any[] = []; // To store hadiths
 let updatePrayerTimesInterval: NodeJS.Timeout;
@@ -77,30 +78,122 @@ function nt_getTodaysPrayerTimes(): any {
     return timetable.find((item: any) => item.month === todayMonth && item.day === todayDay);
 }
 
+function nt_getBootstrapCssPath(webview: vscode.Webview) {
+  const bootstrapPath = vscode.Uri.file(
+    path.join(__dirname, "..", "bootstrap.min.css")
+  );
+  return webview.asWebviewUri(bootstrapPath).toString();
+}
+
 // Function to generate HTML for displaying the prayer times
-function nt_getPrayerTimesHtml(prayerTimes: any): string {
-    if (!prayerTimes) {
-        return '<h3>Prayer times not found for today.</h3>';
-    }
+function nt_getPrayerTimesHtml(
+  webview: vscode.Webview,
+  prayerTimes: any
+): string {
+  if (!prayerTimes) {
+    return "<h3>Prayer times not found for today.</h3>";
+  }
 
-    const fajrStart = nt_addMinutes(prayerTimes.sahriEndHour, prayerTimes.sahriEndMinute, FAJR_START_AFTER_SAHRI_IN_MINUTE);
-    const forbiddenAfterSunriseEnd = nt_addMinutes(prayerTimes.sunriseHour, prayerTimes.sunriseMinute, FORBIDDEN_TIME_END_AFTER_SUNRISE_IN_MINUTE);
-    const forbiddenBeforeNoonStart = nt_addMinutes(prayerTimes.noonHour, prayerTimes.noonMinute, FORBIDDEN_TIME_START_BEFORE_NOON_IN_MINUTE);
-    const forbiddenAfterNoonEnd = nt_addMinutes(prayerTimes.noonHour, prayerTimes.noonMinute, FORBIDDEN_TIME_END_AFTER_NOON_IN_MINUTE);
-    const sunsetBeforeMaghrib = nt_addMinutes(prayerTimes.magribStartHour, prayerTimes.magribStartMinute, SUNSET_TIME_BEFORE_MAGHRIB_IN_MINUTE);
-    const forbiddenBeforeMaghribStart = nt_addMinutes(prayerTimes.magribStartHour, prayerTimes.magribStartMinute, FORBIDDEN_TIME_START_BEFORE_MAGHRIB_IN_MINUTE);
+  const fajrStart = nt_addMinutes(
+    prayerTimes.sahriEndHour,
+    prayerTimes.sahriEndMinute,
+    FAJR_START_AFTER_SAHRI_IN_MINUTE
+  );
+  const forbiddenAfterSunriseEnd = nt_addMinutes(
+    prayerTimes.sunriseHour,
+    prayerTimes.sunriseMinute,
+    FORBIDDEN_TIME_END_AFTER_SUNRISE_IN_MINUTE
+  );
+  const forbiddenBeforeNoonStart = nt_addMinutes(
+    prayerTimes.noonHour,
+    prayerTimes.noonMinute,
+    FORBIDDEN_TIME_START_BEFORE_NOON_IN_MINUTE
+  );
+  const forbiddenAfterNoonEnd = nt_addMinutes(
+    prayerTimes.noonHour,
+    prayerTimes.noonMinute,
+    FORBIDDEN_TIME_END_AFTER_NOON_IN_MINUTE
+  );
+  const sunsetBeforeMaghrib = nt_addMinutes(
+    prayerTimes.magribStartHour,
+    prayerTimes.magribStartMinute,
+    SUNSET_TIME_BEFORE_MAGHRIB_IN_MINUTE
+  );
+  const forbiddenBeforeMaghribStart = nt_addMinutes(
+    prayerTimes.magribStartHour,
+    prayerTimes.magribStartMinute,
+    FORBIDDEN_TIME_START_BEFORE_MAGHRIB_IN_MINUTE
+  );
 
-    return `
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <div class="container mt-4">
-        <h2 class="text-center mb-4">ইসলামিক ফাউন্ডেশনের নামাজের সময় (ঢাকা - ${new Date().getDate()}/${
-      new Date().getMonth() + 1
-    }/${new Date().getFullYear()})</h2>
+  const formatTime12h = (secs: number): string => {
+    const date = new Date(secs * 1000); // Convert seconds to milliseconds
+    const hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const seconds = date.getSeconds().toString().padStart(2, "0");
+    const amPm = hours < 12 ? "AM" : "PM";
+    const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+
+    return `${formattedHours}:${minutes}:${seconds} ${amPm}`;
+  };
+
+  const bootstrapCssPath = nt_getBootstrapCssPath(webview);
+
+  const locationName =
+    locationInfo?.name || locationInfo?.location || localize("location");
+  const showAllPrayerTimesTable = `
+        <h2 class="text-center my-3">${localize(
+          "prayerTimes"
+        )}: ${locationName}</h2>
         <table class="table table-bordered table-striped">
             <thead class="thead-dark">
                 <tr>
-                    <th>Prayer</th>
-                    <th>Time</th>
+                    <th>${localize("waktu")}</th>
+                    <th>${localize("time")}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>${localize("prayers")[0]}</td><td>${formatTime12h(
+    apiPrayerTimes.fajar18.secs
+  )}</td></tr>
+                          <tr><td>${
+                            localize("prayers")[1]
+                          }</td><td>${formatTime12h(
+    apiPrayerTimes.noon.secs + 2 * 60
+  )}</td></tr>
+                          <tr><td>${
+                            localize("prayers")[2]
+                          }</td><td>${formatTime12h(
+    apiPrayerTimes.asar2.secs
+  )}</td></tr>
+                          <tr><td>${
+                            localize("prayers")[3]
+                          }</td><td>${formatTime12h(
+    apiPrayerTimes.set.secs + 2 * 60
+  )}</td></tr>
+                          <tr><td>${
+                            localize("prayers")[4]
+                          }</td><td>${formatTime12h(
+    apiPrayerTimes.esha.secs
+  )}</td></tr>
+            </tbody>
+        </table>
+    `;
+
+  return `
+    <link rel="stylesheet" href="${bootstrapCssPath}">
+    <div class="container mt-4">
+    <div class="row">
+    <div class="col-md-6">
+        <h2 class="text-center mb-4">${localize("prayerTimes")}: (${localize(
+    "ifb"
+  )} ${localize("dhaka")} - ${new Date().getDate()}/${
+    new Date().getMonth() + 1
+  }/${new Date().getFullYear()})</h2>
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>${localize("waktu")}</th>
+                    <th>${localize("time")}</th>
                 </tr>
             </thead>
             <tbody>
@@ -116,9 +209,9 @@ function nt_getPrayerTimesHtml(prayerTimes: any): string {
                   prayerTimes.sunriseHour,
                   prayerTimes.sunriseMinute
                 )} - ${nt_formatTime(
-      forbiddenAfterSunriseEnd.hour,
-      forbiddenAfterSunriseEnd.minute
-    )}</td></tr>
+    forbiddenAfterSunriseEnd.hour,
+    forbiddenAfterSunriseEnd.minute
+  )}</td></tr>
                 <tr><td>যোহর শুরু</td><td id="duhr-start">${nt_formatTime(
                   prayerTimes.noonHour,
                   prayerTimes.noonMinute
@@ -127,9 +220,9 @@ function nt_getPrayerTimesHtml(prayerTimes: any): string {
                   forbiddenBeforeNoonStart.hour,
                   forbiddenBeforeNoonStart.minute
                 )} - ${nt_formatTime(
-      forbiddenAfterNoonEnd.hour,
-      forbiddenAfterNoonEnd.minute
-    )}</td></tr>
+    forbiddenAfterNoonEnd.hour,
+    forbiddenAfterNoonEnd.minute
+  )}</td></tr>
                 <tr><td>আসর শুরু</td><td id="asr-start">${nt_formatTime(
                   prayerTimes.asrStartHour,
                   prayerTimes.asrStartMinute
@@ -138,9 +231,9 @@ function nt_getPrayerTimesHtml(prayerTimes: any): string {
                   forbiddenBeforeMaghribStart.hour,
                   forbiddenBeforeMaghribStart.minute
                 )} - ${nt_formatTime(
-      sunsetBeforeMaghrib.hour,
-      sunsetBeforeMaghrib.minute
-    )}</td></tr>
+    sunsetBeforeMaghrib.hour,
+    sunsetBeforeMaghrib.minute
+  )}</td></tr>
                 <tr><td>মাগরিব শুরু</td><td id="magrib-start">${nt_formatTime(
                   prayerTimes.magribStartHour,
                   prayerTimes.magribStartMinute
@@ -151,6 +244,11 @@ function nt_getPrayerTimesHtml(prayerTimes: any): string {
                 )}</td></tr>
             </tbody>
         </table>
+        </div>
+        <div class="col-md-6">
+        ${showAllPrayerTimesTable} <!-- New Table -->
+        </div>
+        </div>
     </div>
     `;
 }
@@ -240,33 +338,36 @@ export function activate(context: vscode.ExtensionContext) {
       : vscode.StatusBarAlignment.Right,
     100
   );
+
   context.subscriptions.push(prayerTimesStatusBar);
 
   /* register new timer from ifaba */
 
-  let bdTimer = vscode.commands.registerCommand(
-    "extension.showBdPrayerTimes",
+  let bdTimerCommand = vscode.commands.registerCommand(
+    "prayer-timer-bangladesh.showBdPrayerTimes",
     () => {
       // Get today's prayer times
       const prayerTimes = nt_getTodaysPrayerTimes();
-
-      console.log(prayerTimes);
-      
 
       // Create and show the Webview panel
       const panel = vscode.window.createWebviewPanel(
         "prayerTimes", // Identifies the type of the webview. Used internally
         "Bangladesh Prayer Times", // Title of the panel displayed to the user
         vscode.ViewColumn.One, // Editor column to show the new webview panel in.
-        {} // Webview options. More on these later.
+        {
+          enableScripts: true, // Enable scripts in the webview
+          localResourceRoots: [
+            vscode.Uri.file(path.join(context.extensionPath)),
+          ],
+        }
       );
 
       // Set the webview's HTML content
-      panel.webview.html = nt_getPrayerTimesHtml(prayerTimes);
+      panel.webview.html = nt_getPrayerTimesHtml(panel.webview, prayerTimes);
     }
   );
 
-  context.subscriptions.push(bdTimer);
+  context.subscriptions.push(bdTimerCommand);
 
   /* ends new timer from ifaba */
 
@@ -295,6 +396,7 @@ async function loadPrayerTimes(context: vscode.ExtensionContext) {
 
     if (savedPrayerTimes && savedLocationInfo) {
       prayerTimes = savedPrayerTimes;
+      apiPrayerTimes = savedPrayerTimes;
       locationInfo = savedLocationInfo;
       setPrayerData();
     } else {
@@ -320,6 +422,7 @@ async function fetchPrayerTimes(context: vscode.ExtensionContext) {
     const rName = response.data.name || "Unknown";
 
     prayerTimes = response.data.data;
+    apiPrayerTimes = prayerTimes;
 
     locationInfo = {
       location: rLocation,
@@ -453,6 +556,9 @@ function localize(key: string) {
 
   const translations: any = {
     English: {
+      prayer: "Prayer",
+      waktu: "Waktu",
+      time: "Time",
       location: "Location",
       prayerTimes: "Prayer Times",
       nextPrayer: "Next",
@@ -464,8 +570,13 @@ function localize(key: string) {
       timeForPrayer: "It's time for",
       jamat: "Congregation",
       timeForJamat: "It's time for congregation",
+      ifb: "Islamic Foundation Bangladesh",
+      dhaka: "Dhaka",
     },
     Bangla: {
+      prayer: "নামাজ",
+      waktu: "ওয়াক্ত",
+      time: "সময়",
       location: "অবস্থান",
       prayerTimes: "নামাজের সময়সূচী",
       nextPrayer: "পরবর্তী",
@@ -477,6 +588,8 @@ function localize(key: string) {
       timeForPrayer: "নামাজের সময় হয়েছে",
       jamat: "জামাত",
       timeForJamat: "জামাতে সালাতের সময় হয়েছে",
+      ifb: "ইসলামিক ফাউন্ডেশন বাংলাদেশ",
+      dhaka: "ঢাকা",
     },
   };
 
@@ -634,7 +747,7 @@ function scheduleJamatNotification(jamatTime: Date, prayerName: string) {
   if (timeUntilJamat > 0) {
     setTimeout(() => {
       vscode.window.showInformationMessage(
-        `${localize("timeForJamat")} ${prayerName}`
+        `${prayerName} ${localize("timeForJamat")}`
       );
     }, timeUntilJamat);
   }
@@ -696,7 +809,7 @@ function updatePrayerTimesStatusBar(
 ) {
   prayerTimesStatusBar.text = `🕌 ${prayerName} ($(clock) ${remainingTime})`;
   prayerTimesStatusBar.tooltip = `${prayerName}: ${prayerTime}`;
-  prayerTimesStatusBar.command = "prayer-timer-bangladesh.showAllPrayerTimes";
+  prayerTimesStatusBar.command = "prayer-timer-bangladesh.showBdPrayerTimes";
 
   prayerTimesStatusBar.show();
 }

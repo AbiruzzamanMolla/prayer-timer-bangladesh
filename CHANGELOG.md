@@ -4,6 +4,11 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 # Changelog
 
+
+## [1.1.2] - 2024-10-20
+### Added
+- Now Both time will be shown on command and on click the status bar timer
+
 ## [1.1.1] - 2024-10-19
 ### Fixed
 - Update document
