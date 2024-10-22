@@ -1,31 +1,231 @@
 [
   {
-    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Prayer is the pillar of religion. Whoever establishes it has established religion, and whoever destroys it has destroyed religion.'",
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The prayer is a light, and charity is a proof of faith, and patience is a brightness, and the Qur'an is a proof for you or against you.'",
+    "reference": "Sahih Muslim, Book 1, Hadith 36",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The best of your prayers are those which are prayed in your homes, except for the obligatory prayers.'",
+    "reference": "Sahih Bukhari, Book 10, Hadith 522",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'When a servant of Allah stands for prayer, he is conversing with his Lord.'",
+    "reference": "Sahih Bukhari, Book 10, Hadith 504",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Indeed, the prayer prevents one from immorality and wrongdoing.'",
+    "reference": "Surah Al-Ankabut, 45",
+    "status": "Quranic verse"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'If anyone of you prays, let him cover himself, for Allah is more deserving of modesty than the people.'",
+    "reference": "Sunan Abu Dawood, Book 2, Hadith 641",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'A person’s prayer is not accepted if he has something stuck between his teeth that could be seen for a long time.'",
+    "reference": "Sahih Muslim, Book 4, Hadith 767",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The closest that a servant comes to his Lord is when he is prostrating, so make plenty of supplication (dua) during it.'",
+    "reference": "Sahih Muslim, Book 4, Hadith 759",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Whoever prays Fajr in congregation, he is in the protection of Allah.'",
+    "reference": "Sahih Muslim, Book 4, Hadith 760",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Whoever prays 2 rak'ahs of prayer and perfects them, Allah will forgive his previous sins.'",
+    "reference": "Sahih Muslim, Book 4, Hadith 770",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The prayer of a person who does not perform ablution is not accepted.'",
+    "reference": "Sunan Ibn Majah, Book 1, Hadith 397",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Perform the prayer in your houses and do not make them graves.'",
+    "reference": "Sahih Bukhari, Book 10, Hadith 524",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'If a man prays at night and he recites the Qur'an, it is better for him.'",
+    "reference": "Sahih Muslim, Book 4, Hadith 785",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The best of your prayers is that which you perform in your homes and that which is performed in the mosque.'",
+    "reference": "Sunan Abu Dawood, Book 2, Hadith 634",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The prayer is the first thing for which a servant will be held accountable on the Day of Resurrection.'",
     "reference": "Sunan Ibn Majah, Book 5, Hadith 224",
     "status": "Sahih"
   },
   {
-    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The most beloved of deeds to Allah is the prayer at its proper time.'",
-    "reference": "Sahih Bukhari, Book 10, Hadith 503",
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'There are angels who accompany you and write down your prayer.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 111",
     "status": "Sahih"
   },
   {
-    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Your prayer in your house is better than your prayer in this mosque, except for the obligatory prayer.'",
-    "reference": "Sahih Muslim, Book 4, Hadith 773",
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'When one of you finishes the prayer, let him say: 'O Allah, forgive me my mistakes and my ignorance, and any of my errors in my affairs.'",
+    "reference": "Sunan Abu Dawood, Book 2, Hadith 785",
     "status": "Sahih"
   },
   {
-    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Perform the prayer as if it is your last prayer.'",
-    "reference": "Sunan Ibn Majah, Book 5, Hadith 433",
-    "status": "Daif"
-  },
-  {
-    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The first deed for which a person will be questioned on the Day of Resurrection is prayer.'",
-    "reference": "Sunan Al-Kubra, Hadith 5100",
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The two rak'ahs before Fajr are better than the world and what it contains.'",
+    "reference": "Sahih Muslim, Book 4, Hadith 759",
     "status": "Sahih"
   },
   {
-    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Whoever prays twelve rak'ahs in a day and night, a house will be built for him in Paradise.'",
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Pray two rak'ahs of prayer at the time of hardship, and they will bring you ease.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 371",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Allah does not look at your appearance or wealth, but He looks at your hearts and your actions.'",
+    "reference": "Sahih Muslim, Book 1, Hadith 65",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'If the prayer of a person does not prevent him from committing immoral acts, he has not performed it properly.'",
+    "reference": "Sahih Muslim, Book 4, Hadith 138",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The one who performs the prayer with humility has the weight of a mountain.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 1031",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'There is a gate in Paradise that is called 'Prayer'.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 378",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Your prayer is a shield against the fire of Hell.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 382",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The one who observes the five daily prayers will have his sins forgiven even if they are like the foam of the sea.'",
+    "reference": "Sahih Muslim, Book 4, Hadith 793",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Pray as you have seen me pray.'",
+    "reference": "Sahih Bukhari, Book 10, Hadith 703",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The one who prays the night prayer will be in the company of the Prophets.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 965",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Indeed, your prayers should not become a burden on you, but a source of comfort.'",
+    "reference": "Sunan Abu Dawood, Book 2, Hadith 794",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Do not be like those who do not pray, for they are not from me.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 361",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Prayer is the best of deeds after belief in Allah.'",
+    "reference": "Sahih Bukhari, Book 10, Hadith 548",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The prayer of a person who prays while he is intoxicated is not accepted until he is sober.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 381",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The prayer performed in congregation is twenty-seven times better than the prayer performed alone.'",
+    "reference": "Sahih Bukhari, Book 10, Hadith 618",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Allah has made it obligatory for you to pray five times a day.'",
+    "reference": "Sahih Bukhari, Book 10, Hadith 559",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Do not let the prayer become a burden; pray at your ease.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 362",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The one who misses a prayer deliberately is like a man who loses his family and wealth.'",
+    "reference": "Sahih Muslim, Book 4, Hadith 761",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'If one of you forgets a prayer, let him pray it when he remembers it.'",
+    "reference": "Sahih Bukhari, Book 10, Hadith 580",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Your prayer should be with your heart present, and do not let your heart wander.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 378",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The prayer is a duty and a right upon every Muslim.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 557",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Indeed, Allah loves when any one of you performs a deed, he should perfect it.'",
+    "reference": "Sahih Muslim, Book 1, Hadith 45",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'He who performs the evening prayer is in the protection of Allah until the morning.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 528",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Your prayer will not be accepted if you do not recite Surah Al-Fatiha.'",
+    "reference": "Sahih Bukhari, Book 10, Hadith 734",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'If you pray in congregation, do not leave the rows.'",
+    "reference": "Sahih Muslim, Book 4, Hadith 861",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The prayer is a means of attaining peace and tranquility.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 388",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Perform the prayer at night, as it was the practice of the righteous before you.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 362",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'Be mindful of your prayers, for they are your guide to success.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 312",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The one who prays the night prayer is like a man who defends his family and wealth.'",
+    "reference": "Sunan Ibn Majah, Book 5, Hadith 393",
+    "status": "Sahih"
+  },
+  {
+    "hadith": "The Prophet Muhammad (peace be upon him) said, 'The one who observes prayer will be like the one who remembers Allah.'",
     "reference": "Sahih Muslim, Book 4, Hadith 759",
     "status": "Sahih"
   }

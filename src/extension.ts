@@ -9,6 +9,7 @@ const CONFIG_KEY_LNG = "prayerTimerBangladesh.lng";
 const CONFIG_KEY_TZNAME = "prayerTimerBangladesh.tzname";
 const CONFIG_KEY_POSITION = "prayerTimerBangladesh.position";
 const CONFIG_KEY_ACTIVE = "prayerTimerBangladesh.active";
+const CONFIG_KEY_TAB_NOTIFY_STATUS = "prayerTimerBangladesh.tabNotificationsActive";
 const CONFIG_KEY_LANGUAGE = "prayerTimerBangladesh.language";
 const CONFIG_KEY_JAMAT_ACTIVE = "prayerTimerBangladesh.jamatActive";
 const CONFIG_KEY_FAJAR_JAMAT = "prayerTimerBangladesh.jamatFajarMinutes";
@@ -686,10 +687,11 @@ function localize(key: string) {
       prayerTimes: "Prayer Times",
       nextPrayer: "Next",
       remainingTime: "left",
-      until: "until",
+      until: "until starting",
       prayers: ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"],
       hadith: "Hadith",
       reference: "Reference",
+      status: "Authenticity level",
       timeForPrayer: "It's time for",
       jamat: "Congregation",
       timeForJamat: "It's time for congregation",
@@ -704,10 +706,11 @@ function localize(key: string) {
       prayerTimes: "নামাজের সময়সূচী",
       nextPrayer: "পরবর্তী",
       remainingTime: "অবশিষ্ট",
-      until: "পর্যন্ত",
+      until: "পর",
       prayers: ["ফজর", "যোহর", "আসর", "মাগরিব", "ইশা"],
       hadith: "হাদিস",
       reference: "উদ্ধৃতি",
+      status: "হাদিসের মান",
       timeForPrayer: "নামাজের সময় হয়েছে",
       jamat: "জামাত",
       timeForJamat: "জামাতে সালাতের সময় হয়েছে",
@@ -918,9 +921,9 @@ function showHadithNotification() {
   const randomIndex = Math.floor(Math.random() * hadiths.length);
   const hadith = hadiths[randomIndex];
   vscode.window.showInformationMessage(
-    `${localize("hadith")}: ${hadith.hadith}\n\n${localize("reference")}: ${
-      hadith.reference
-    }`,
+    `${localize("hadith")}: ${hadith.hadith}\n\n` + 
+    `${localize("reference")}: ${hadith.reference}\n` + 
+    `${localize("status")}: ${hadith.status}`,
     { modal: false }
   );
 }
@@ -980,6 +983,10 @@ function setPrayerAlarms(times: string[]) {
   const currentTime = new Date();
   const currentSecs = Math.floor(currentTime.getTime() / 1000);
 
+  const isTabNotifyActive = vscode.workspace
+    .getConfiguration()
+    .get<boolean>(CONFIG_KEY_TAB_NOTIFY_STATUS);
+
   alarmTimes.forEach((alarm) => {
     if (alarm.time > currentSecs) {
       const timeUntilAlarm = alarm.time - currentSecs;
@@ -987,7 +994,9 @@ function setPrayerAlarms(times: string[]) {
         vscode.window.showInformationMessage(
           `${localize("timeForPrayer")} ${alarm.name}!`
         );
-        showPrayerAlarmPopup(alarm.name);
+        if (isTabNotifyActive)  {
+          showPrayerAlarmPopup(alarm.name);
+        }
       }, timeUntilAlarm * 1000);
 
       prayerAlarmTimeouts.push(timeout);
@@ -1024,7 +1033,7 @@ function getWebviewContent(prayerName: string): string {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Prayer Alarm</title>   
+        <title>Prayer Alarm - ${prayerName}</title>   
 
         <style>
             body {
@@ -1058,13 +1067,6 @@ function getWebviewContent(prayerName: string): string {
     </head>
     <body>
         <h1>It's time for ${prayerName}!</h1>
-        <button class="btn" onclick="closeWindow()">Close</button>
-        <script>
-            const vscode = acquireVsCodeApi();
-            function closeWindow() {
-                vscode.postMessage({ command: 'close' });
-            }
-        </script>
     </body>
 </html>`;
 }
