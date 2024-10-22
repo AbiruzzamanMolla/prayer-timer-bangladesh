@@ -709,7 +709,7 @@ function localize(key: string) {
       until: "পর",
       prayers: ["ফজর", "যোহর", "আসর", "মাগরিব", "ইশা"],
       hadith: "হাদিস",
-      reference: "উদ্ধৃতি",
+      reference: "সূত্র",
       status: "হাদিসের মান",
       timeForPrayer: "নামাজের সময় হয়েছে",
       jamat: "জামাত",
