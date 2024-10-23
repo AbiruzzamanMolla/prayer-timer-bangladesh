@@ -4,9 +4,11 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 # Changelog
 
-## [1.1.5] - 2024-10-22
+## [1.1.5-6] - 2024-10-22
 ### Fixed
 - Fix Jamat Timer issue
+### Change
+- Downgraded the required engine version to 1.75.0
 
 ## [1.1.4] - 2024-10-22
 ### Added 

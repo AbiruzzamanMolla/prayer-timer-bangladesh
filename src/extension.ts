@@ -28,6 +28,12 @@ let hadiths: any[] = []; // To store hadiths
 let updatePrayerTimesInterval: NodeJS.Timeout;
 let currentWebviewPanel: vscode.WebviewPanel | undefined;
 
+let fajarJamatTime: Date;
+let dhuhrJamatTime: Date;
+let asrJamatTime: Date;
+let maghribJamatTime: Date;
+let ishaJamatTime: Date;
+
 // Keys to store prayer times and location info in global state
 const PRAYER_TIMES_KEY = "prayerTimesBangladesh";
 const LOCATION_INFO_KEY = "locationInfoBangladesh";
@@ -138,31 +144,20 @@ function nt_getPrayerTimesHtml(
   };
 
   const getJamatTime = (prayer:string): string => {
-    // Get configuration values with defaults
-    const fajarJamatMinutes =
-      vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_FAJAR_JAMAT) ||
-      30;
-    const dhuhrJamatMinutes =
-      vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_DHUHR_JAMAT) ||
-      30;
-    const asrJamatMinutes =
-      vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_ASR_JAMAT) ||
-      45;
-    const maghribJamatMinutes =
-      vscode.workspace
-        .getConfiguration()
-        .get<number>(CONFIG_KEY_MAGHRIB_JAMAT) || 30;
-    const ishaJamatMinutes =
-      vscode.workspace.getConfiguration().get<number>(CONFIG_KEY_ISHA_JAMAT) ||
-      60;
 
-    // Calculate the jamat times
-    const dhuhrJamatTime = apiPrayerTimes.noon.secs + dhuhrJamatMinutes * 60; // Add jamat time in seconds
-    const fajarJamatTime = apiPrayerTimes.fajar18.secs + fajarJamatMinutes * 60; // Corrected reference for Fajr
-    const asrJamatTime = apiPrayerTimes.asar2.secs + asrJamatMinutes * 60; // Ensure seconds are handled correctly
-    const maghribJamatTime =
-      apiPrayerTimes.magrib12.secs + maghribJamatMinutes * 60; // Ensure seconds are handled correctly
-    const ishaJamatTime = apiPrayerTimes.esha.secs + ishaJamatMinutes * 60; // Ensure seconds are handled correctly
+    const formatTimeFromDate = (date: Date): string => {
+      const lang =
+        vscode.workspace.getConfiguration().get<string>(CONFIG_KEY_LANGUAGE) ===
+        "Bangla"
+          ? "bn-BD"
+          : "en-US";
+
+      return date.toLocaleTimeString(lang, {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      });
+    };
 
     // Example function to format the timestamp to a readable time format
     function formatTimeFromSeconds(totalSeconds: number) {
@@ -190,15 +185,15 @@ function nt_getPrayerTimesHtml(
     }
 
     if (prayer === "fajar18") {
-      return formatTimeFromSeconds(fajarJamatTime);
+      return formatTimeFromDate(fajarJamatTime);
     } else if (prayer === "noon") {
-      return formatTimeFromSeconds(dhuhrJamatTime);
+      return formatTimeFromDate(dhuhrJamatTime);
     } else if (prayer === "asar2") {
-      return formatTimeFromSeconds(asrJamatTime);
+      return formatTimeFromDate(asrJamatTime);
     } else if (prayer === "set") {
-      return formatTimeFromSeconds(maghribJamatTime);
+      return formatTimeFromDate(maghribJamatTime);
     } else if (prayer === "esha") {
-      return formatTimeFromSeconds(ishaJamatTime);
+      return formatTimeFromDate(ishaJamatTime);
     }
 
     return '';
@@ -252,10 +247,11 @@ function nt_getPrayerTimesHtml(
                                     <td id="sunrise-forbidden">${nt_formatTime(
                                       prayerTimes.sunriseHour,
                                       prayerTimes.sunriseMinute
-                                    )} - ${nt_formatTime(
-    forbiddenAfterSunriseEnd.hour,
-    forbiddenAfterSunriseEnd.minute
-  )}</td>
+                                      )} - ${nt_formatTime(
+                                        forbiddenAfterSunriseEnd.hour,
+                                        forbiddenAfterSunriseEnd.minute
+                                      )}
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>যোহর শুরু</td>
@@ -587,23 +583,23 @@ function setPrayerData() {
     `${prayerTimes.esha.short}`,
   ];
 
-  const fajarJamatTime = new Date(
-    prayerTimes.noon.secs + 120 * 1000 + fajarJamatMinutes * 60 * 1000
+  fajarJamatTime = new Date(
+    prayerTimes.fajar18.secs * 1000 + 120 * 1000 + fajarJamatMinutes * 60 * 1000
   );
 
-  const dhuhrJamatTime = new Date(
-    prayerTimes.noon.secs + 120 * 1000 + dhuhrJamatMinutes * 60 * 1000
+  dhuhrJamatTime = new Date(
+    prayerTimes.noon.secs * 1000 + 120 * 1000 + dhuhrJamatMinutes * 60 * 1000
   );
 
-  const asrJamatTime = new Date(
+  asrJamatTime = new Date(
     prayerTimes.asar2.secs * 1000 + asrJamatMinutes * 60 * 1000
   );
 
-  const maghribJamatTime = new Date(
-    prayerTimes.set.secs + 120 * 1000 + maghribJamatMinutes * 60 * 1000
+  maghribJamatTime = new Date(
+    prayerTimes.set.secs * 1000 + 120 * 1000 + maghribJamatMinutes * 60 * 1000
   );
 
-  const ishaJamatTime = new Date(
+  ishaJamatTime = new Date(
     prayerTimes.esha.secs * 1000 + ishaJamatMinutes * 60 * 1000
   );
 
