@@ -6,7 +6,7 @@
   "publisher": "azmolla",
   "icon": "icon.webp",
   "engines": {
-    "vscode": "^1.75.0"
+    "vscode": "^1.94.0"
   },
   "bugs": {
     "url": "https://github.com/AbiruzzamanMolla/prayer-timer-bangladesh/issues"
