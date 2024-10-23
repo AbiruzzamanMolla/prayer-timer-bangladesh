@@ -587,12 +587,12 @@ function setPrayerData() {
     `${prayerTimes.esha.short}`,
   ];
 
-  const dhuhrJamatTime = new Date(
-    prayerTimes.noon.secs + 120 * 1000 + dhuhrJamatMinutes * 60 * 1000
-  );
-
   const fajarJamatTime = new Date(
     prayerTimes.noon.secs + 120 * 1000 + fajarJamatMinutes * 60 * 1000
+  );
+
+  const dhuhrJamatTime = new Date(
+    prayerTimes.noon.secs + 120 * 1000 + dhuhrJamatMinutes * 60 * 1000
   );
 
   const asrJamatTime = new Date(
@@ -600,7 +600,7 @@ function setPrayerData() {
   );
 
   const maghribJamatTime = new Date(
-    prayerTimes.magrib12.secs * 1000 + maghribJamatMinutes * 60 * 1000
+    prayerTimes.set.secs + 120 * 1000 + maghribJamatMinutes * 60 * 1000
   );
 
   const ishaJamatTime = new Date(
@@ -614,12 +614,7 @@ function setPrayerData() {
   if (isActive) {
     const currentPrayer = getCurrentPrayer(
       prayerNames,
-      allPrayerTimes,
-      dhuhrJamatTime,
-      fajarJamatTime,
-      asrJamatTime,
-      maghribJamatTime,
-      ishaJamatTime
+      allPrayerTimes
     );
     if (currentPrayer) {
       updatePrayerTimesStatusBar(
@@ -637,12 +632,7 @@ function setPrayerData() {
       updatePrayerTimesInterval = setInterval(() => {
         const updatedPrayer = getCurrentPrayer(
           prayerNames,
-          allPrayerTimes,
-          dhuhrJamatTime,
-          fajarJamatTime,
-          asrJamatTime,
-          maghribJamatTime,
-          ishaJamatTime
+          allPrayerTimes
         );
         if (updatedPrayer) {
           updatePrayerTimesStatusBar(
@@ -673,71 +663,12 @@ function setPrayerData() {
   }
 }
 
-function localize(key: string) {
-  const language =
-    vscode.workspace.getConfiguration().get<string>(CONFIG_KEY_LANGUAGE) ||
-    "English";
-
-  const translations: any = {
-    English: {
-      prayer: "Prayer",
-      waktu: "Waktu",
-      time: "Time",
-      location: "Location",
-      prayerTimes: "Prayer Times",
-      nextPrayer: "Next",
-      remainingTime: "left",
-      until: "until starting",
-      prayers: ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"],
-      hadith: "Hadith",
-      reference: "Reference",
-      status: "Authenticity level",
-      timeForPrayer: "It's time for",
-      jamat: "Congregation",
-      timeForJamat: "It's time for congregation",
-      ifb: "Islamic Foundation Bangladesh",
-      dhaka: "Dhaka",
-    },
-    Bangla: {
-      prayer: "নামাজ",
-      waktu: "ওয়াক্ত",
-      time: "সময়",
-      location: "অবস্থান",
-      prayerTimes: "নামাজের সময়সূচী",
-      nextPrayer: "পরবর্তী",
-      remainingTime: "অবশিষ্ট",
-      until: "পর",
-      prayers: ["ফজর", "যোহর", "আসর", "মাগরিব", "ইশা"],
-      hadith: "হাদিস",
-      reference: "সূত্র",
-      status: "হাদিসের মান",
-      timeForPrayer: "নামাজের সময় হয়েছে",
-      jamat: "জামাত",
-      timeForJamat: "জামাতে সালাতের সময় হয়েছে",
-      ifb: "ইসলামিক ফাউন্ডেশন বাংলাদেশ",
-      dhaka: "ঢাকা",
-    },
-  };
-
-  return translations[language][key];
-}
-
 function getCurrentPrayer(
   prayerNames: string[],
   times: string[],
-  dhuhrJamatTime: Date,
-  fajarJamatTime: Date,
-  asrJamatTime: Date,
-  maghribJamatTime: Date,
-  ishaJamatTime: Date
 ) {
   const currentTime = new Date();
   const currentSecs = Math.floor(currentTime.getTime() / 1000);
-  const dhuhrJamatSecs = Math.floor(dhuhrJamatTime.getTime() / 1000);
-  const fajarJamatSecs = Math.floor(fajarJamatTime.getTime() / 1000);
-  const asrJamatSecs = Math.floor(asrJamatTime.getTime() / 1000);
-  const maghribJamatSecs = Math.floor(maghribJamatTime.getTime() / 1000);
-  const ishaJamatSecs = Math.floor(ishaJamatTime.getTime() / 1000);
 
   // Define prayer time ranges
   const prayerRanges = [
@@ -747,18 +678,8 @@ function getCurrentPrayer(
       end: prayerTimes.rise.secs,
     },
     {
-      name: prayerNames[0] + " " + localize("jamat"), // Fajar Jamat
-      start: fajarJamatSecs,
-      end: prayerTimes.rise.secs,
-    },
-    {
       name: prayerNames[1], // Dhuhr
       start: prayerTimes.noon.secs + 120,
-      end: prayerTimes.asar2.secs,
-    },
-    {
-      name: prayerNames[1] + " " + localize("jamat"), // Dhuhr Jamat
-      start: dhuhrJamatSecs,
       end: prayerTimes.asar2.secs,
     },
     {
@@ -767,18 +688,8 @@ function getCurrentPrayer(
       end: prayerTimes.set.secs - 300, // 5 minutes before sunset (300 seconds)
     },
     {
-      name: prayerNames[2] + " " + localize("jamat"), // Asr Jamat
-      start: asrJamatSecs,
-      end: prayerTimes.set.secs - 300, // 5 minutes before sunset (300 seconds)
-    },
-    {
       name: prayerNames[3], // Maghrib
       start: prayerTimes.set.secs + 120, // 2 minutes after sunset (120 seconds)
-      end: prayerTimes.magrib12.secs,
-    },
-    {
-      name: prayerNames[3] + " " + localize("jamat"), // Maghrib Jamat
-      start: maghribJamatSecs,
       end: prayerTimes.magrib12.secs,
     },
     {
@@ -786,11 +697,6 @@ function getCurrentPrayer(
       start: prayerTimes.esha.secs,
       end: prayerTimes.fajar18.secs + 86400,
     }, // Add 24 hours for next day's Fajr
-    {
-      name: prayerNames[4] + " " + localize("jamat"), // Isha Jamat
-      start: ishaJamatSecs,
-      end: prayerTimes.fajar18.secs + 86400,
-    },
   ];
 
   // Find current prayer
@@ -1084,6 +990,55 @@ function loadHadiths() {
       console.error("Error parsing hadiths:", error);
     }
   });
+}
+
+function localize(key: string) {
+  const language =
+    vscode.workspace.getConfiguration().get<string>(CONFIG_KEY_LANGUAGE) ||
+    "English";
+
+  const translations: any = {
+    English: {
+      prayer: "Prayer",
+      waktu: "Waktu",
+      time: "Time",
+      location: "Location",
+      prayerTimes: "Prayer Times",
+      nextPrayer: "Next",
+      remainingTime: "left",
+      until: "until starting",
+      prayers: ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"],
+      hadith: "Hadith",
+      reference: "Reference",
+      status: "Authenticity level",
+      timeForPrayer: "It's time for",
+      jamat: "Congregation",
+      timeForJamat: "It's time for congregation",
+      ifb: "Islamic Foundation Bangladesh",
+      dhaka: "Dhaka",
+    },
+    Bangla: {
+      prayer: "নামাজ",
+      waktu: "ওয়াক্ত",
+      time: "সময়",
+      location: "অবস্থান",
+      prayerTimes: "নামাজের সময়সূচী",
+      nextPrayer: "পরবর্তী",
+      remainingTime: "অবশিষ্ট",
+      until: "পর",
+      prayers: ["ফজর", "যোহর", "আসর", "মাগরিব", "ইশা"],
+      hadith: "হাদিস",
+      reference: "সূত্র",
+      status: "হাদিসের মান",
+      timeForPrayer: "নামাজের সময় হয়েছে",
+      jamat: "জামাত",
+      timeForJamat: "জামাতে সালাতের সময় হয়েছে",
+      ifb: "ইসলামিক ফাউন্ডেশন বাংলাদেশ",
+      dhaka: "ঢাকা",
+    },
+  };
+
+  return translations[language][key];
 }
 
 export function deactivate() {
