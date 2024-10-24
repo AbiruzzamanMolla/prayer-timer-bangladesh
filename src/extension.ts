@@ -70,7 +70,11 @@ function nt_formatTime(hour: number, minute: number): string {
     const period = hour >= 12 ? 'pm' : 'am';
     const adjustedHour = hour % 12 === 0 ? 12 : hour % 12;
     const formattedMinute = minute < 10 ? `0${minute}` : minute;
-    return `${adjustedHour}:${formattedMinute}${period}`;
+    return `${replaceEnglishWithBanglaNumbers(
+      adjustedHour
+    )}:${replaceEnglishWithBanglaNumbers(
+      formattedMinute
+    )} ${replaceEnglishWithBanglaNumbers(period)}`;
 }
 
 // Function to get today's prayer times from JSON
@@ -137,10 +141,16 @@ function nt_getPrayerTimesHtml(
     const hours = date.getHours();
     const minutes = date.getMinutes().toString().padStart(2, "0");
     const seconds = date.getSeconds().toString().padStart(2, "0");
-    const amPm = hours < 12 ? "AM" : "PM";
+    const amPm = hours < 12 ? "am" : "pm";
     const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
 
-    return `${formattedHours}:${minutes}:${seconds} ${amPm}`;
+    return `${replaceEnglishWithBanglaNumbers(
+      formattedHours
+    )}:${replaceEnglishWithBanglaNumbers(
+      minutes
+    )}:${replaceEnglishWithBanglaNumbers(
+      seconds
+    )} ${replaceEnglishWithBanglaNumbers(amPm)}`;
   };
 
   const getJamatTime = (prayer:string): string => {
@@ -152,37 +162,14 @@ function nt_getPrayerTimesHtml(
           ? "bn-BD"
           : "en-US";
 
-      return date.toLocaleTimeString(lang, {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-      });
+      return replaceEnglishWithBanglaNumbers(
+        date.toLocaleTimeString(lang, {
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        })
+      );
     };
-
-    // Example function to format the timestamp to a readable time format
-    function formatTimeFromSeconds(totalSeconds: number) {
-      const date = new Date(totalSeconds * 1000);
-
-      enum Language {
-        English = "en-US",
-        Bangla = "bn-BD",
-      };
-
-      let lang;
-      const language = vscode.workspace.getConfiguration().get<string>(CONFIG_KEY_LANGUAGE) || "English";
-
-      if (language === "Bangla") {
-        lang = Language.Bangla;
-      } else {
-        lang = Language.English;
-      }
-      
-      return date.toLocaleTimeString(lang, {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-      });
-    }
 
     if (prayer === "fajar18") {
       return formatTimeFromDate(fajarJamatTime);
@@ -215,9 +202,11 @@ function nt_getPrayerTimesHtml(
                         "prayerTimes"
                       )}: (${localize("ifb")} ${localize(
     "dhaka"
-  )} - ${new Date().getDate()}/${
+  )} - ${replaceEnglishWithBanglaNumbers(
+    new Date().getDate()
+  )}/${replaceEnglishWithBanglaNumbers(
     new Date().getMonth() + 1
-  }/${new Date().getFullYear()})</h2>
+  )}/${replaceEnglishWithBanglaNumbers(new Date().getFullYear())})</h2>
                     </div>
                     <div class="card-body">
                         <table class="table table-bordered table-striped">
@@ -229,39 +218,39 @@ function nt_getPrayerTimesHtml(
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>সাহরীর শেষ সময়</td>
+                                    <td>${localize("sehriEndTime")}</td>
                                     <td id="sahri-end">${nt_formatTime(
                                       prayerTimes.sahriEndHour,
                                       prayerTimes.sahriEndMinute
                                     )}</td>
                                 </tr>
                                 <tr>
-                                    <td>ফজর শুরু</td>
+                                    <td>${localize("fajrStart")}</td>
                                     <td id="fajr-start">${nt_formatTime(
                                       fajrStart.hour,
                                       fajrStart.minute
                                     )}</td>
                                 </tr>
                                 <tr>
-                                    <td>সূর্যোদয় ও নামাজের নিষিদ্ধ সময়</td>
+                                    <td>${localize("sunriseForbiddenTime")}</td>
                                     <td id="sunrise-forbidden">${nt_formatTime(
                                       prayerTimes.sunriseHour,
                                       prayerTimes.sunriseMinute
-                                      )} - ${nt_formatTime(
-                                        forbiddenAfterSunriseEnd.hour,
-                                        forbiddenAfterSunriseEnd.minute
-                                      )}
+                                    )} - ${nt_formatTime(
+    forbiddenAfterSunriseEnd.hour,
+    forbiddenAfterSunriseEnd.minute
+  )}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>যোহর শুরু</td>
+                                    <td>${localize("zuhrStart")}</td>
                                     <td id="duhr-start">${nt_formatTime(
                                       prayerTimes.noonHour,
                                       prayerTimes.noonMinute
                                     )}</td>
                                 </tr>
                                 <tr>
-                                    <td>দ্বিপ্রহর ও নামাজের নিষিদ্ধ সময়</td>
+                                    <td>${localize("middayForbiddenTime")}</td>
                                     <td id="noon-forbidden">${nt_formatTime(
                                       forbiddenBeforeNoonStart.hour,
                                       forbiddenBeforeNoonStart.minute
@@ -271,14 +260,14 @@ function nt_getPrayerTimesHtml(
   )}</td>
                                 </tr>
                                 <tr>
-                                    <td>আসর শুরু</td>
+                                    <td>${localize("asrStart")}</td>
                                     <td id="asr-start">${nt_formatTime(
                                       prayerTimes.asrStartHour,
                                       prayerTimes.asrStartMinute
                                     )}</td>
                                 </tr>
                                 <tr>
-                                    <td>সূর্যাস্ত ও নামাজের নিষিদ্ধ সময়</td>
+                                    <td>${localize("sunsetForbiddenTime")}</td>
                                     <td id="sunset-forbidden">${nt_formatTime(
                                       forbiddenBeforeMaghribStart.hour,
                                       forbiddenBeforeMaghribStart.minute
@@ -288,14 +277,14 @@ function nt_getPrayerTimesHtml(
   )}</td>
                                 </tr>
                                 <tr>
-                                    <td>মাগরিব শুরু</td>
+                                    <td>${localize("maghribStart")}</td>
                                     <td id="magrib-start">${nt_formatTime(
                                       prayerTimes.magribStartHour,
                                       prayerTimes.magribStartMinute
                                     )}</td>
                                 </tr>
                                 <tr>
-                                    <td>এশা শুরু</td>
+                                    <td>${localize("ishaStart")}</td>
                                     <td id="isha-start">${nt_formatTime(
                                       prayerTimes.ishaStartHour,
                                       prayerTimes.ishaStartMinute
@@ -659,6 +648,29 @@ function setPrayerData() {
   }
 }
 
+function replaceEnglishWithBanglaNumbers(num: number | string): string {
+  if(vscode.workspace.getConfiguration().get<string>(CONFIG_KEY_LANGUAGE) === "Bangla"){
+    return num
+      .toString()
+      .replace(/0/g, "০")
+      .replace(/1/g, "১")
+      .replace(/2/g, "২")
+      .replace(/3/g, "৩")
+      .replace(/4/g, "৪")
+      .replace(/5/g, "৫")
+      .replace(/6/g, "৬")
+      .replace(/7/g, "৭")
+      .replace(/8/g, "৮")
+      .replace(/9/g, "৯")
+      .replace(/am/g, "এএম")
+      .replace(/pm/g, "পিএম")
+      .replace(/AM/g, "এএম")
+      .replace(/PM/g, "পিএম");
+  } else {
+    return num.toString();
+  }
+}
+
 function getCurrentPrayer(
   prayerNames: string[],
   times: string[],
@@ -707,7 +719,11 @@ function getCurrentPrayer(
           hour: "2-digit",
           minute: "2-digit",
         }),
-        remainingTime: `${hours}h ${minutes}m ${localize("remainingTime")}`,
+        remainingTime: `${replaceEnglishWithBanglaNumbers(hours)}${localize(
+          "h"
+        )} ${replaceEnglishWithBanglaNumbers(minutes)}${localize(
+          "m"
+        )} ${localize("remainingTime")}`,
       };
     }
   }
@@ -764,7 +780,11 @@ function getNextPrayerInfo(
       hour: "2-digit",
       minute: "2-digit",
     }),
-    remainingTime: `${hours}h ${minutes}m ${localize("until")} ${prayerName}`,
+    remainingTime: `${replaceEnglishWithBanglaNumbers(hours)}${localize(
+      "h"
+    )} ${replaceEnglishWithBanglaNumbers(minutes)}${localize("m")} ${localize(
+      "until"
+    )} ${prayerName}`,
   };
 }
 
@@ -854,7 +874,13 @@ function showAllPrayerTimes() {
     const amPm = hours < 12 ? "AM" : "PM";
     const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
 
-    return `${formattedHours}:${minutes}:${seconds} ${amPm}`;
+    return `${replaceEnglishWithBanglaNumbers(
+      formattedHours
+    )}:${replaceEnglishWithBanglaNumbers(
+      minutes
+    )}:${replaceEnglishWithBanglaNumbers(
+      seconds
+    )} ${replaceEnglishWithBanglaNumbers(amPm)}`;
   };
 
   const message = `
@@ -1012,6 +1038,18 @@ function localize(key: string) {
       timeForJamat: "It's time for congregation",
       ifb: "Islamic Foundation Bangladesh",
       dhaka: "Dhaka",
+      h: "h",
+      m: "m",
+      s: "s",
+      sehriEndTime: "End time for Suhoor",
+      fajrStart: "Fajr starts",
+      sunriseForbiddenTime: "Sunrise and forbidden time for prayer",
+      zuhrStart: "Dhuhr starts",
+      middayForbiddenTime: "Midday and forbidden time for prayer",
+      asrStart: "Asr starts",
+      sunsetForbiddenTime: "Sunset and forbidden time for prayer",
+      maghribStart: "Maghrib starts",
+      ishaStart: "Isha starts",
     },
     Bangla: {
       prayer: "নামাজ",
@@ -1031,6 +1069,18 @@ function localize(key: string) {
       timeForJamat: "জামাতে সালাতের সময় হয়েছে",
       ifb: "ইসলামিক ফাউন্ডেশন বাংলাদেশ",
       dhaka: "ঢাকা",
+      h: "ঘন্টা",
+      m: "মিনিট",
+      s: "সেকেন্ড",
+      sehriEndTime: "সাহরীর শেষ সময়",
+      fajrStart: "ফজর শুরু",
+      sunriseForbiddenTime: "সূর্যোদয় ও নামাজের নিষিদ্ধ সময়",
+      zuhrStart: "যোহর শুরু",
+      middayForbiddenTime: "দ্বিপ্রহর ও নামাজের নিষিদ্ধ সময়",
+      asrStart: "আসর শুরু",
+      sunsetForbiddenTime: "সূর্যাস্ত ও নামাজের নিষিদ্ধ সময়",
+      maghribStart: "মাগরিব শুরু",
+      ishaStart: "এশা শুরু",
     },
   };
 
