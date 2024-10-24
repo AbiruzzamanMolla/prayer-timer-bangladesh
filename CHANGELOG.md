@@ -4,7 +4,7 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 # Changelog
 
-## [1.1.7] - 2024-10-22
+## [1.1.7-8-9] - 2024-10-22
 ### Fixed
 - Fully Multilanguage text and times 
 
