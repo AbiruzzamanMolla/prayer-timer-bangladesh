@@ -201,12 +201,12 @@ function nt_getPrayerTimesHtml(
                       <h2 class="text-center mb-4">${localize(
                         "prayerTimes"
                       )}: (${localize("ifb")} ${localize(
-    "dhaka"
-  )} - ${replaceEnglishWithBanglaNumbers(
-    new Date().getDate()
-  )}/${replaceEnglishWithBanglaNumbers(
-    new Date().getMonth() + 1
-  )}/${replaceEnglishWithBanglaNumbers(new Date().getFullYear())})</h2>
+                        "dhaka"
+                      )} - ${replaceEnglishWithBanglaNumbers(
+                        new Date().getDate()
+                      )}/${replaceEnglishWithBanglaNumbers(
+                        new Date().getMonth() + 1
+                      )}/${replaceEnglishWithBanglaNumbers(new Date().getFullYear())})</h2>
                     </div>
                     <div class="card-body">
                         <table class="table table-bordered table-striped">
@@ -900,6 +900,7 @@ function showAllPrayerTimes() {
 
 function setPrayerAlarms(times: string[]) {
   const prayerNames = localize("prayers");
+
   const alarmTimes = [
     { name: prayerNames[0], time: prayerTimes.fajar18.secs },
     { name: prayerNames[1], time: prayerTimes.noon.secs + 120 },
@@ -925,6 +926,28 @@ function setPrayerAlarms(times: string[]) {
         if (isTabNotifyActive)  {
           showPrayerAlarmPopup(alarm.name);
         }
+      }, timeUntilAlarm * 1000);
+
+      prayerAlarmTimeouts.push(timeout);
+    }
+  });
+
+  const alarmEndTimes = [
+    { name: prayerNames[0], time: prayerTimes.noon.secs - 480 }, // Noon prayer, 8 minutes earlier
+    { name: prayerNames[1], time: prayerTimes.asar2.secs - 600 }, // Asar prayer, 10 minutes earlier
+    { name: prayerNames[2], time: prayerTimes.set.secs - 480 }, // Maghrib prayer, 8 minutes earlier
+    { name: prayerNames[3], time: prayerTimes.esha.secs - 600 }, // Esha prayer, 10 minutes earlier
+    { name: prayerNames[4], time: prayerTimes.fajar18.secs + 85800 }, // Fajar prayer, next day minus 10 minutes
+  ];
+
+
+  alarmEndTimes.forEach((alarm) => {
+    if (alarm.time > currentSecs) {
+      const timeUntilAlarm = alarm.time - currentSecs;
+      const timeout = setTimeout(() => {
+        vscode.window.showInformationMessage(
+          `${localize("timeLeftForPrayer")} ${alarm.name}!`
+        );
       }, timeUntilAlarm * 1000);
 
       prayerAlarmTimeouts.push(timeout);
@@ -1034,6 +1057,7 @@ function localize(key: string) {
       reference: "Reference",
       status: "Authenticity level",
       timeForPrayer: "It's time for",
+      timeLeftForPrayer: "10 minutes left for ",
       jamat: "Congregation",
       timeForJamat: "It's time for congregation",
       ifb: "Islamic Foundation Bangladesh",
@@ -1065,6 +1089,7 @@ function localize(key: string) {
       reference: "সূত্র",
       status: "হাদিসের মান",
       timeForPrayer: "নামাজের সময় হয়েছে",
+      timeLeftForPrayer: "ওয়াক্ত শেষ হতে ১০ মিনিট বাকি, ওয়াক্তঃ ",
       jamat: "জামাত",
       timeForJamat: "জামাতে সালাতের সময় হয়েছে",
       ifb: "ইসলামিক ফাউন্ডেশন বাংলাদেশ",

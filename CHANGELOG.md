@@ -4,6 +4,11 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 
 # Changelog
 
+
+## [1.2.0] - 2024-10-31
+### Added
+- Added Prayer end time notification before 10 minutes
+
 ## [1.1.7-8-9] - 2024-10-22
 ### Fixed
 - Fully Multilanguage text and times 
