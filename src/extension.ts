@@ -20,6 +20,7 @@ const CONFIG_KEY_ISHA_JAMAT = "prayerTimerBangladesh.jamatIshaMinutes";
 
 let prayerTimesStatusBar: vscode.StatusBarItem;
 let prayerAlarmTimeouts: NodeJS.Timeout[] = [];
+let prayerEndAlarmTimeouts: NodeJS.Timeout[] = [];
 let allPrayerTimes: string[] = []; // To store all prayer times
 let prayerTimes: any; // To store all prayer data
 let apiPrayerTimes: any; // To store all prayer data
@@ -628,8 +629,9 @@ function setPrayerData() {
         }
       }, 60000); // 60,000 ms = 1 minute
 
-      setPrayerAlarms(allPrayerTimes); // Schedule the prayer alarms
-      schedulePrayerHadithNotifications(allPrayerTimes); // Schedule hadith notifications
+      setPrayerAlarms(allPrayerTimes);
+      setEndPrayerAlarms(allPrayerTimes);
+      schedulePrayerHadithNotifications(allPrayerTimes);
 
       const isJamatActive = vscode.workspace
         .getConfiguration()
@@ -931,15 +933,20 @@ function setPrayerAlarms(times: string[]) {
       prayerAlarmTimeouts.push(timeout);
     }
   });
+}
+
+function setEndPrayerAlarms(times: string[]){
+  const prayerNames = localize("prayers");
+  const currentTime = new Date();
+  const currentSecs = Math.floor(currentTime.getTime() / 1000);
 
   const alarmEndTimes = [
-    { name: prayerNames[0], time: prayerTimes.noon.secs - 480 }, // Noon prayer, 8 minutes earlier
-    { name: prayerNames[1], time: prayerTimes.asar2.secs - 600 }, // Asar prayer, 10 minutes earlier
-    { name: prayerNames[2], time: prayerTimes.set.secs - 480 }, // Maghrib prayer, 8 minutes earlier
-    { name: prayerNames[3], time: prayerTimes.esha.secs - 600 }, // Esha prayer, 10 minutes earlier
-    { name: prayerNames[4], time: prayerTimes.fajar18.secs + 85800 }, // Fajar prayer, next day minus 10 minutes
+    { name: prayerNames[0], time: prayerTimes.noon.secs - 480 },
+    { name: prayerNames[1], time: prayerTimes.asar2.secs - 600 },
+    { name: prayerNames[2], time: prayerTimes.set.secs - 480 },
+    { name: prayerNames[3], time: prayerTimes.esha.secs - 600 },
+    { name: prayerNames[4], time: prayerTimes.fajar18.secs + 85800 },
   ];
-
 
   alarmEndTimes.forEach((alarm) => {
     if (alarm.time > currentSecs) {
@@ -950,7 +957,7 @@ function setPrayerAlarms(times: string[]) {
         );
       }, timeUntilAlarm * 1000);
 
-      prayerAlarmTimeouts.push(timeout);
+      prayerEndAlarmTimeouts.push(timeout);
     }
   });
 }
@@ -1115,4 +1122,5 @@ function localize(key: string) {
 export function deactivate() {
   prayerTimesStatusBar.hide();
   prayerAlarmTimeouts.forEach((timeout) => clearTimeout(timeout));
+  prayerEndAlarmTimeouts.forEach((timeout) => clearTimeout(timeout));
 }
