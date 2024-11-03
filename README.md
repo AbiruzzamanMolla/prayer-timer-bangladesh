@@ -27,16 +27,18 @@
   - ![Prayer Timer Notification](./screenshots/prayer-notifications.png)
   - ![Prayer Timer Notification](./screenshots/prayer-notifications-fullpage.png)
   - ![Prayer Timer Notification](./screenshots/hadith-notification.png)
+  - ![Prayer Timer All Notification Bangla](./screenshots/prayer-notifications-all-bn.png)
+  - ![Prayer Timer All Notification Bangla](./screenshots/prayer-end-notifications.png)
   
 - **Status Bar Integration**: Seamlessly displays the current prayer time in the status bar without disrupting your workflow.
 
-  ![Prayer Timer Bangladesh Icon](./screenshots/timer-in-status-bar-en.png)
-  ![Prayer Timer Bangladesh Icon - Bangla](./screenshots/timer-in-status-bar-bn.png)
+  - ![Prayer Timer Bangladesh Icon](./screenshots/timer-in-status-bar-en.png)
+  - ![Prayer Timer Bangladesh Icon - Bangla](./screenshots/timer-in-status-bar-bn.png)
 
 - **Show All Prayer Times**: By Clicking on the status bar item, you can see all prayer times in a list.
 
-  ![Prayer Timer Bangladesh Icon](./screenshots/show-all-times-en.png)
-  ![Prayer Timer Bangladesh Icon - Bangla](./screenshots/show-all-times-bn.png)
+  - ![Prayer Timer Bangladesh Icon](./screenshots/show-all-times-en.png)
+  - ![Prayer Timer Bangladesh Icon - Bangla](./screenshots/show-all-times-bn.png)
 
 - **Islamic Foundation Bangladesh Prayer Timer**: By runing the command `Show Today's Islamic Foundation Prayer Timer` you can see todays prayer time given by islamic foundation.
 
