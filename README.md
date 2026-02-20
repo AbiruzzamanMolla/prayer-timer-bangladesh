@@ -102,6 +102,10 @@ This extension is 100% offline. All local calculations are handled through the o
 
 For more information, to report bugs, or contribute, visit the [GitHub repository](https://github.com/abiruzzamanmolla/prayer-timer-bangladesh).
 
+## 👏 Credits
+
+The beautiful React Webview dashboard UI was originally developed by [Hasan Mahmood (HasanC14)](https://github.com/HasanC14/PrayerTime). It has been adapted and integrated into this native VS Code extension architecture.
+
 ## 📄 License
 
 This project is licensed under the MIT License.
