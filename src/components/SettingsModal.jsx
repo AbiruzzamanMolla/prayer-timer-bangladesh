@@ -38,7 +38,10 @@ const CALCULATION_METHODS = [
   { id: 20, name: "KEMENAG - Kementerian Agama Republik Indonesia" },
   { id: 21, name: "Morocco" },
   { id: 22, name: "Comunidade Islamica de Lisboa" },
-  { id: 23, name: "Ministry of Awqaf, Islamic Affairs and Holy Places, Jordan" },
+  {
+    id: 23,
+    name: "Ministry of Awqaf, Islamic Affairs and Holy Places, Jordan",
+  },
 ];
 
 const ASR_METHODS = [
@@ -60,36 +63,39 @@ const CircularAnglePicker = ({ angle, onChange }) => {
   const pickerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const handleInteraction = useCallback((e) => {
-    if (!pickerRef.current) return;
+  const handleInteraction = useCallback(
+    (e) => {
+      if (!pickerRef.current) return;
 
-    const rect = pickerRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
+      const rect = pickerRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
 
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-    // Calculate angle in degrees
-    // Math.atan2(y, x) returns radians. We want 0 at top (12 o'clock)
-    const deltaX = clientX - centerX;
-    const deltaY = clientY - centerY;
+      // Calculate angle in degrees
+      // Math.atan2(y, x) returns radians. We want 0 at top (12 o'clock)
+      const deltaX = clientX - centerX;
+      const deltaY = clientY - centerY;
 
-    let rad = Math.atan2(deltaY, deltaX);
-    let deg = rad * (180 / Math.PI);
+      let rad = Math.atan2(deltaY, deltaX);
+      let deg = rad * (180 / Math.PI);
 
-    // Adjust to make 0 at top (currently 0 is at 3 o'clock)
-    deg = deg + 90;
+      // Adjust to make 0 at top (currently 0 is at 3 o'clock)
+      deg = deg + 90;
 
-    // Normalize to 0-360
-    if (deg < 0) deg += 360;
+      // Normalize to 0-360
+      if (deg < 0) deg += 360;
 
-    onChange(Math.round(deg));
-  }, [onChange]);
+      onChange(Math.round(deg));
+    },
+    [onChange],
+  );
 
   const handleMouseDown = (e) => {
     // Prevent default to stop text selection/scrolling while dragging
-    // e.preventDefault(); 
+    // e.preventDefault();
     setIsDragging(true);
     handleInteraction(e);
   };
@@ -107,17 +113,17 @@ const CircularAnglePicker = ({ angle, onChange }) => {
     };
 
     if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-      window.addEventListener('touchmove', handleMouseMove, { passive: false });
-      window.addEventListener('touchend', handleMouseUp);
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+      window.addEventListener("touchmove", handleMouseMove, { passive: false });
+      window.addEventListener("touchend", handleMouseUp);
     }
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('touchmove', handleMouseMove);
-      window.removeEventListener('touchend', handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("touchmove", handleMouseMove);
+      window.removeEventListener("touchend", handleMouseUp);
     };
   }, [isDragging, handleInteraction]);
 
@@ -132,7 +138,7 @@ const CircularAnglePicker = ({ angle, onChange }) => {
         <div
           className="angle-indicator"
           style={{
-            transform: `rotate(${angle}deg) translate(0, -14px)`
+            transform: `rotate(${angle}deg) translate(0, -14px)`,
           }}
         />
       </div>
@@ -176,7 +182,7 @@ const SettingsModal = ({
     if (selectedLocation) {
       setManualCoords({
         lat: selectedLocation.lat ?? "",
-        lng: selectedLocation.lng ?? ""
+        lng: selectedLocation.lng ?? "",
       });
     }
   }, [selectedLocation]);
@@ -193,8 +199,8 @@ const SettingsModal = ({
     try {
       const response = await fetch(
         `https://api.locationiq.com/v1/autocomplete?key=${LOCATIONIQ_API_KEY}&q=${encodeURIComponent(
-          query
-        )}&limit=5&dedupe=1`
+          query,
+        )}&limit=5&dedupe=1`,
       );
 
       if (!response.ok) throw new Error("Failed to fetch suggestions");
@@ -247,11 +253,11 @@ const SettingsModal = ({
 
   if (!isOpen) return null;
 
-  const displayLocations = searchTerm.length >= MIN_SEARCH_LENGTH
-    ? suggestions
-    : recentLocations;
+  const displayLocations =
+    searchTerm.length >= MIN_SEARCH_LENGTH ? suggestions : recentLocations;
 
-  const showNoResults = searchTerm.length >= MIN_SEARCH_LENGTH &&
+  const showNoResults =
+    searchTerm.length >= MIN_SEARCH_LENGTH &&
     !isLoadingSuggestions &&
     suggestions.length === 0;
 
@@ -296,6 +302,12 @@ const SettingsModal = ({
           >
             Calculation
           </button>
+          <button
+            className={`tab-button ${activeTab === "congregation" ? "active" : ""}`}
+            onClick={() => setActiveTab("congregation")}
+          >
+            Congregation
+          </button>
         </div>
 
         <div className="settings-content">
@@ -305,15 +317,17 @@ const SettingsModal = ({
                 <label>Time Format</label>
                 <div className="toggle-group">
                   <button
-                    className={`toggle-btn ${safeSettings.timeFormat === "12h" ? "active" : ""
-                      }`}
+                    className={`toggle-btn ${
+                      safeSettings.timeFormat === "12h" ? "active" : ""
+                    }`}
                     onClick={() => handleSettingChange("timeFormat", "12h")}
                   >
                     12 Hour
                   </button>
                   <button
-                    className={`toggle-btn ${safeSettings.timeFormat === "24h" ? "active" : ""
-                      }`}
+                    className={`toggle-btn ${
+                      safeSettings.timeFormat === "24h" ? "active" : ""
+                    }`}
                     onClick={() => handleSettingChange("timeFormat", "24h")}
                   >
                     24 Hour
@@ -325,15 +339,17 @@ const SettingsModal = ({
                 <label>Background Style</label>
                 <div className="toggle-group">
                   <button
-                    className={`toggle-btn ${safeSettings.bgType === "solid" ? "active" : ""
-                      }`}
+                    className={`toggle-btn ${
+                      safeSettings.bgType === "solid" ? "active" : ""
+                    }`}
                     onClick={() => handleSettingChange("bgType", "solid")}
                   >
                     Solid Color
                   </button>
                   <button
-                    className={`toggle-btn ${safeSettings.bgType === "gradient" ? "active" : ""
-                      }`}
+                    className={`toggle-btn ${
+                      safeSettings.bgType === "gradient" ? "active" : ""
+                    }`}
                     onClick={() => handleSettingChange("bgType", "gradient")}
                   >
                     Gradient
@@ -348,7 +364,9 @@ const SettingsModal = ({
                     <input
                       type="color"
                       value={safeSettings.bgColor || "#ffffff"}
-                      onChange={(e) => handleSettingChange("bgColor", e.target.value)}
+                      onChange={(e) =>
+                        handleSettingChange("bgColor", e.target.value)
+                      }
                     />
                     <span>{safeSettings.bgColor || "#ffffff"}</span>
                   </div>
@@ -357,50 +375,108 @@ const SettingsModal = ({
                 <div className="setting-group">
                   <div className="custom-gradient-section">
                     <div style={{ marginBottom: "16px" }}>
-                      <label style={{ fontSize: "12px", marginBottom: "8px", display: "block" }}>Gradient Style</label>
-                      <div style={{ display: "flex", alignItems: "center", gap: "12px", background: "#f8fafc", padding: "12px", borderRadius: "12px" }}>
+                      <label
+                        style={{
+                          fontSize: "12px",
+                          marginBottom: "8px",
+                          display: "block",
+                        }}
+                      >
+                        Gradient Style
+                      </label>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          background: "#f8fafc",
+                          padding: "12px",
+                          borderRadius: "12px",
+                        }}
+                      >
                         <div style={{ flex: 1, display: "flex", gap: "8px" }}>
-                          <div className="color-picker-wrapper" style={{ padding: "4px 8px", border: "none", background: "transparent" }}>
+                          <div
+                            className="color-picker-wrapper"
+                            style={{
+                              padding: "4px 8px",
+                              border: "none",
+                              background: "transparent",
+                            }}
+                          >
                             <input
                               type="color"
                               value={safeSettings.gradientStart || "#d7bedc"}
-                              onChange={(e) => handleSettingChange("gradientStart", e.target.value)}
+                              onChange={(e) =>
+                                handleSettingChange(
+                                  "gradientStart",
+                                  e.target.value,
+                                )
+                              }
                             />
                             <span>Start</span>
                           </div>
-                          <div className="color-picker-wrapper" style={{ padding: "4px 8px", border: "none", background: "transparent" }}>
+                          <div
+                            className="color-picker-wrapper"
+                            style={{
+                              padding: "4px 8px",
+                              border: "none",
+                              background: "transparent",
+                            }}
+                          >
                             <input
                               type="color"
                               value={safeSettings.gradientEnd || "#ecdfee"}
-                              onChange={(e) => handleSettingChange("gradientEnd", e.target.value)}
+                              onChange={(e) =>
+                                handleSettingChange(
+                                  "gradientEnd",
+                                  e.target.value,
+                                )
+                              }
                             />
-                            <span >End</span>
+                            <span>End</span>
                           </div>
                         </div>
 
-                        <div style={{ width: "1px", height: "50px", background: "#e2e8f0" }}></div>
+                        <div
+                          style={{
+                            width: "1px",
+                            height: "50px",
+                            background: "#e2e8f0",
+                          }}
+                        ></div>
 
                         <div style={{ padding: "0 8px" }}>
                           <CircularAnglePicker
                             angle={safeSettings.gradientAngle || 100}
-                            onChange={(newAngle) => handleSettingChange("gradientAngle", newAngle)}
+                            onChange={(newAngle) =>
+                              handleSettingChange("gradientAngle", newAngle)
+                            }
                           />
                         </div>
                       </div>
                     </div>
 
-                    <label style={{ fontSize: "12px", marginBottom: "8px", display: "block" }}>Quick Select</label>
+                    <label
+                      style={{
+                        fontSize: "12px",
+                        marginBottom: "8px",
+                        display: "block",
+                      }}
+                    >
+                      Quick Select
+                    </label>
                     <div className="gradient-grid">
                       {PREDEFINED_GRADIENTS.map((gradient) => (
                         <div
                           key={gradient.name}
-                          className={`gradient-option ${safeSettings.gradientStart === gradient.start &&
+                          className={`gradient-option ${
+                            safeSettings.gradientStart === gradient.start &&
                             safeSettings.gradientEnd === gradient.end
-                            ? "selected"
-                            : ""
-                            }`}
+                              ? "selected"
+                              : ""
+                          }`}
                           style={{
-                            background: `linear-gradient(${gradient.angle}deg, ${gradient.start} 0%, ${gradient.end} 100%)`
+                            background: `linear-gradient(${gradient.angle}deg, ${gradient.start} 0%, ${gradient.end} 100%)`,
                           }}
                           onClick={() => {
                             onSettingsChange({
@@ -408,7 +484,7 @@ const SettingsModal = ({
                               bgType: "gradient",
                               gradientStart: gradient.start,
                               gradientEnd: gradient.end,
-                              gradientAngle: gradient.angle
+                              gradientAngle: gradient.angle,
                             });
                           }}
                           title={gradient.name}
@@ -420,7 +496,6 @@ const SettingsModal = ({
                         </div>
                       ))}
                     </div>
-
                   </div>
                 </div>
               )}
@@ -519,11 +594,12 @@ const SettingsModal = ({
                 />
               </div>
 
-              {searchTerm.length > 0 && searchTerm.length < MIN_SEARCH_LENGTH && (
-                <div className="search-hint">
-                  Type at least {MIN_SEARCH_LENGTH} characters to search
-                </div>
-              )}
+              {searchTerm.length > 0 &&
+                searchTerm.length < MIN_SEARCH_LENGTH && (
+                  <div className="search-hint">
+                    Type at least {MIN_SEARCH_LENGTH} characters to search
+                  </div>
+                )}
 
               {isLoadingSuggestions && (
                 <div className="loading-suggestions">Searching...</div>
@@ -538,17 +614,21 @@ const SettingsModal = ({
                   displayLocations.map((location, index) => (
                     <div
                       key={index}
-                      className={`city-item ${selectedLocation?.lat === location.lat &&
+                      className={`city-item ${
+                        selectedLocation?.lat === location.lat &&
                         selectedLocation?.lng === location.lng
-                        ? "selected"
-                        : ""
-                        }`}
+                          ? "selected"
+                          : ""
+                      }`}
                       onClick={() => {
                         console.log("📍 Location selected from list:", {
                           name: location.name,
                           lat: location.lat,
                           lng: location.lng,
-                          source: searchTerm.length >= MIN_SEARCH_LENGTH ? "API" : "Recent",
+                          source:
+                            searchTerm.length >= MIN_SEARCH_LENGTH
+                              ? "API"
+                              : "Recent",
                         });
                         onLocationChange(location);
                         setSearchTerm("");
@@ -565,41 +645,66 @@ const SettingsModal = ({
                 ) : showNoResults ? (
                   <div className="no-results">No locations found</div>
                 ) : searchTerm.length === 0 && recentLocations.length === 0 ? (
-                  <div className="no-results">No recent locations. Search to find a location.</div>
+                  <div className="no-results">
+                    No recent locations. Search to find a location.
+                  </div>
                 ) : null}
               </div>
 
               <div className="divider"></div>
 
               <div className="setting-group">
-                <label style={{ marginBottom: "10px" }}>Manual Coordinates</label>
+                <label style={{ marginBottom: "10px" }}>
+                  Manual Coordinates
+                </label>
                 <form
-                  style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}
+                  style={{
+                    display: "flex",
+                    gap: "8px",
+                    alignItems: "flex-end",
+                  }}
                   onSubmit={async (e) => {
                     e.preventDefault();
                     const formData = new FormData(e.target);
                     const lat = parseFloat(formData.get("latitude"));
                     const lng = parseFloat(formData.get("longitude"));
 
-                    if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+                    if (
+                      !isNaN(lat) &&
+                      !isNaN(lng) &&
+                      lat >= -90 &&
+                      lat <= 90 &&
+                      lng >= -180 &&
+                      lng <= 180
+                    ) {
                       setIsLoadingSuggestions(true);
                       let locationName = "Custom Coordinates";
 
                       try {
                         const response = await fetch(
-                          `https://us1.locationiq.com/v1/reverse?key=${LOCATIONIQ_API_KEY}&lat=${lat}&lon=${lng}&format=json`
+                          `https://us1.locationiq.com/v1/reverse?key=${LOCATIONIQ_API_KEY}&lat=${lat}&lon=${lng}&format=json`,
                         );
                         if (response.ok) {
                           const data = await response.json();
                           // Construct a shorter name: City, Country
                           const addr = data.address || {};
-                          const city = addr.city || addr.town || addr.village || addr.suburb || addr.municipality || addr.county || addr.state_district;
+                          const city =
+                            addr.city ||
+                            addr.town ||
+                            addr.village ||
+                            addr.suburb ||
+                            addr.municipality ||
+                            addr.county ||
+                            addr.state_district;
                           const country = addr.country;
 
                           if (city && country) {
                             locationName = `${city}, ${country}`;
                           } else if (data.display_name) {
-                            locationName = data.display_name.split(',').slice(0, 2).join(','); // Take first 2 parts if no specific city found
+                            locationName = data.display_name
+                              .split(",")
+                              .slice(0, 2)
+                              .join(","); // Take first 2 parts if no specific city found
                           }
                         }
                       } catch (err) {
@@ -609,45 +714,59 @@ const SettingsModal = ({
                         onLocationChange({
                           name: locationName,
                           lat: lat,
-                          lng: lng
+                          lng: lng,
                         });
                       }
                     }
                   }}
                 >
                   <div style={{ flex: 1 }}>
-                    <label style={{ fontSize: "10px", marginBottom: "4px" }}>Latitude</label>
+                    <label style={{ fontSize: "10px", marginBottom: "4px" }}>
+                      Latitude
+                    </label>
                     <input
                       name="latitude"
                       type="number"
                       step="any"
                       placeholder="23.81"
                       value={manualCoords.lat}
-                      onChange={(e) => setManualCoords(prev => ({ ...prev, lat: e.target.value }))}
+                      onChange={(e) =>
+                        setManualCoords((prev) => ({
+                          ...prev,
+                          lat: e.target.value,
+                        }))
+                      }
                       style={{
                         width: "100%",
                         padding: "8px",
                         border: "1px solid #e2e8f0",
                         borderRadius: "8px",
-                        fontSize: "13px"
+                        fontSize: "13px",
                       }}
                     />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <label style={{ fontSize: "10px", marginBottom: "4px" }}>Longitude</label>
+                    <label style={{ fontSize: "10px", marginBottom: "4px" }}>
+                      Longitude
+                    </label>
                     <input
                       name="longitude"
                       type="number"
                       step="any"
                       placeholder="90.41"
                       value={manualCoords.lng}
-                      onChange={(e) => setManualCoords(prev => ({ ...prev, lng: e.target.value }))}
+                      onChange={(e) =>
+                        setManualCoords((prev) => ({
+                          ...prev,
+                          lng: e.target.value,
+                        }))
+                      }
                       style={{
                         width: "100%",
                         padding: "8px",
                         border: "1px solid #e2e8f0",
                         borderRadius: "8px",
-                        fontSize: "13px"
+                        fontSize: "13px",
                       }}
                     />
                   </div>
@@ -663,7 +782,7 @@ const SettingsModal = ({
                       fontSize: "13px",
                       cursor: isLoadingSuggestions ? "wait" : "pointer",
                       height: "35px",
-                      minWidth: "60px"
+                      minWidth: "60px",
                     }}
                   >
                     {isLoadingSuggestions ? "..." : "Apply"}
@@ -680,7 +799,10 @@ const SettingsModal = ({
                   Calculation Method
                   <div className="tooltip-container">
                     <span className="tooltip-icon">?</span>
-                    <span className="tooltip-text">Determines the angles used for Fajr and Isha prayers based on your region.</span>
+                    <span className="tooltip-text">
+                      Determines the angles used for Fajr and Isha prayers based
+                      on your region.
+                    </span>
                   </div>
                 </label>
                 <select
@@ -689,7 +811,10 @@ const SettingsModal = ({
                   onChange={(e) => {
                     const value = e.target.value;
                     // Keep "auto" as string, convert numbers to actual numbers
-                    handleSettingChange("method", value === "auto" ? "auto" : Number(value));
+                    handleSettingChange(
+                      "method",
+                      value === "auto" ? "auto" : Number(value),
+                    );
                   }}
                 >
                   {CALCULATION_METHODS.map((method) => (
@@ -705,13 +830,18 @@ const SettingsModal = ({
                   Asr Method
                   <div className="tooltip-container">
                     <span className="tooltip-icon">?</span>
-                    <span className="tooltip-text">Standard (Shafi, Maliki, Hanbali) uses shadow ratio 1:1. Hanafi uses shadow ratio 2:1.</span>
+                    <span className="tooltip-text">
+                      Standard (Shafi, Maliki, Hanbali) uses shadow ratio 1:1.
+                      Hanafi uses shadow ratio 2:1.
+                    </span>
                   </div>
                 </label>
                 <select
                   className="settings-select"
                   value={safeSettings.school}
-                  onChange={(e) => handleSettingChange("school", Number(e.target.value))}
+                  onChange={(e) =>
+                    handleSettingChange("school", Number(e.target.value))
+                  }
                 >
                   {ASR_METHODS.map((method) => (
                     <option key={method.id} value={method.id}>
@@ -726,13 +856,18 @@ const SettingsModal = ({
                   Midnight Mode
                   <div className="tooltip-container">
                     <span className="tooltip-icon">?</span>
-                    <span className="tooltip-text">Standard calculates midnight as halfway between Sunset and Sunrise. Jafari calculates it between Sunset and Fajr.</span>
+                    <span className="tooltip-text">
+                      Standard calculates midnight as halfway between Sunset and
+                      Sunrise. Jafari calculates it between Sunset and Fajr.
+                    </span>
                   </div>
                 </label>
                 <select
                   className="settings-select"
                   value={safeSettings.midnightMode}
-                  onChange={(e) => handleSettingChange("midnightMode", Number(e.target.value))}
+                  onChange={(e) =>
+                    handleSettingChange("midnightMode", Number(e.target.value))
+                  }
                 >
                   {MIDNIGHT_MODES.map((mode) => (
                     <option key={mode.id} value={mode.id}>
@@ -747,14 +882,20 @@ const SettingsModal = ({
                   High Latitude Rule
                   <div className="tooltip-container">
                     <span className="tooltip-icon">?</span>
-                    <span className="tooltip-text">Adjusts prayer times for locations with high latitudes where twilight may persist or days are very long.</span>
+                    <span className="tooltip-text">
+                      Adjusts prayer times for locations with high latitudes
+                      where twilight may persist or days are very long.
+                    </span>
                   </div>
                 </label>
                 <select
                   className="settings-select"
                   value={safeSettings.latitudeAdjustmentMethod}
                   onChange={(e) =>
-                    handleSettingChange("latitudeAdjustmentMethod", Number(e.target.value))
+                    handleSettingChange(
+                      "latitudeAdjustmentMethod",
+                      Number(e.target.value),
+                    )
                   }
                 >
                   {LATITUDE_ADJUSTMENTS.map((method) => (
@@ -764,6 +905,126 @@ const SettingsModal = ({
                   ))}
                 </select>
               </div>
+            </div>
+          )}
+          {activeTab === "congregation" && (
+            <div className="calculation-settings">
+              <div
+                style={{
+                  marginBottom: "16px",
+                  fontSize: "12px",
+                  color: "var(--secondary-text-color)",
+                  textAlign: "center",
+                }}
+              >
+                Congregational Prayer offsets are the number of minutes after
+                the Adhan/Start time that the congregation begins.
+              </div>
+
+              <div className="setting-group">
+                <label>
+                  Notify me before Congregation
+                  <div className="tooltip-container">
+                    <span className="tooltip-icon">?</span>
+                    <span className="tooltip-text">
+                      How many minutes before the Congregation starts would you
+                      like to receive a notification?
+                    </span>
+                  </div>
+                </label>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    width: "100%",
+                  }}
+                >
+                  <input
+                    type="range"
+                    min="0"
+                    max="30"
+                    value={
+                      safeSettings.congregationNotifyBefore !== undefined
+                        ? safeSettings.congregationNotifyBefore
+                        : 5
+                    }
+                    onChange={(e) =>
+                      handleSettingChange(
+                        "congregationNotifyBefore",
+                        Number(e.target.value),
+                      )
+                    }
+                    style={{
+                      flex: 1,
+                      accentColor: "var(--primary-text-color)",
+                    }}
+                  />
+                  <span
+                    style={{ fontSize: "13px", width: "50px", fontWeight: 600 }}
+                  >
+                    {safeSettings.congregationNotifyBefore !== undefined
+                      ? safeSettings.congregationNotifyBefore
+                      : 5}{" "}
+                    min
+                  </span>
+                </div>
+              </div>
+
+              {["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].map((prayer) => {
+                const currentOffsets = safeSettings.congregationOffsets || {
+                  Fajr: 30,
+                  Dhuhr: 15,
+                  Asr: 15,
+                  Maghrib: 10,
+                  Isha: 15,
+                };
+                const offsetVal =
+                  currentOffsets[prayer] !== undefined
+                    ? currentOffsets[prayer]
+                    : 15;
+
+                return (
+                  <div className="setting-group" key={`congregation_${prayer}`}>
+                    <label>{prayer} Offset</label>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        width: "100%",
+                      }}
+                    >
+                      <input
+                        type="range"
+                        min="0"
+                        max="120"
+                        step="1"
+                        value={offsetVal}
+                        onChange={(e) => {
+                          handleSettingChange("congregationOffsets", {
+                            ...currentOffsets,
+                            [prayer]: Number(e.target.value),
+                          });
+                        }}
+                        style={{
+                          flex: 1,
+                          accentColor: "var(--primary-text-color)",
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontSize: "13px",
+                          width: "50px",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {offsetVal} min
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

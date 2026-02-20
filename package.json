@@ -2,7 +2,7 @@
   "name": "prayer-timer-bangladesh",
   "displayName": "Muslim Prayer Timer",
   "description": "The Prayer Timer extension provides an easy and convenient way to track prayer times based on your GPS location. With this extension, you can seamlessly integrate prayer time notifications into your Visual Studio Code environment.",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "type": "module",
   "publisher": "azmolla",
   "icon": "icon.webp",

@@ -45,6 +45,8 @@ const DEFAULT_SETTINGS = {
   latitudeAdjustmentMethod: 3, // Angle Based
   timeFormat: "12h", // Default to 12-hour format
   ramadanMode: false,
+  congregationOffsets: { Fajr: 30, Dhuhr: 15, Asr: 15, Maghrib: 10, Isha: 15 },
+  congregationNotifyBefore: 5,
 };
 
 // Main App Component
@@ -71,6 +73,14 @@ function App() {
     progress: 0,
   });
   const [prayerProgress, setPrayerProgress] = useState(0);
+
+  // Congregation Tracking
+  const [congregationPopup, setCongregationPopup] = useState({
+    show: false,
+    prayerName: null,
+    remainingTime: 0,
+    dismissedFor: null, // keeps track of which prayer's congregation was dismissed so we don't show it again
+  });
 
   // Initialize app data
   useEffect(() => {
@@ -318,6 +328,56 @@ function App() {
               Math.max(0, (elapsed / total) * 100),
             );
             setPrayerProgress(progress);
+
+            // CONGREGATION CALCULATION
+            if (currentPrayer !== "Sunrise" && settings.congregationOffsets) {
+              const offsetMins =
+                settings.congregationOffsets[currentPrayer] || 0;
+              const congregationTime = new Date(
+                currentPrayerStart.getTime() + offsetMins * 60000,
+              );
+
+              // Show popup if within 5 mins before congregation, up to congregation time
+              const fiveMinsBefore = new Date(
+                congregationTime.getTime() - 5 * 60000,
+              );
+
+              // If the prayer changed, reset the dismissed flag if it doesn't match
+              setCongregationPopup((prev) => {
+                const isDismissed =
+                  prev.dismissedFor ===
+                  `${currentPrayer}_${congregationTime.getTime()}`;
+                if (
+                  currentTime >= fiveMinsBefore &&
+                  currentTime < congregationTime &&
+                  !isDismissed
+                ) {
+                  return {
+                    ...prev,
+                    show: true,
+                    prayerName: currentPrayer,
+                    remainingTime:
+                      congregationTime.getTime() - currentTime.getTime(),
+                  };
+                } else if (currentTime >= congregationTime && prev.show) {
+                  // Hide it once it passes
+                  return { ...prev, show: false };
+                }
+                // Keep updating remaining time if it's showing
+                if (prev.show && prev.prayerName === currentPrayer) {
+                  return {
+                    ...prev,
+                    remainingTime:
+                      congregationTime.getTime() - currentTime.getTime(),
+                  };
+                }
+                return prev;
+              });
+            } else {
+              setCongregationPopup((prev) =>
+                prev.show ? { ...prev, show: false } : prev,
+              );
+            }
           }
         }
       }
@@ -684,6 +744,73 @@ function App() {
                   </span>
                 </div>
               </div>
+
+              {/* CONGREGATION POPUP */}
+              {congregationPopup.show &&
+                congregationPopup.remainingTime > 0 && (
+                  <div
+                    style={{
+                      marginTop: "12px",
+                      padding: "8px 16px",
+                      background: "rgba(255, 255, 255, 0.15)",
+                      backdropFilter: "blur(4px)",
+                      borderRadius: "8px",
+                      border: "1px solid rgba(255, 255, 255, 0.3)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "12px",
+                      width: "100%",
+                      maxWidth: "300px",
+                    }}
+                  >
+                    <div
+                      style={{ fontSize: "12px", textAlign: "left", flex: 1 }}
+                    >
+                      <div style={{ fontWeight: 600, marginBottom: "2px" }}>
+                        Congregational Prayer
+                      </div>
+                      <div style={{ opacity: 0.9 }}>
+                        Starts in {formatTime(congregationPopup.remainingTime)}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setCongregationPopup((prev) => ({
+                          ...prev,
+                          show: false,
+                          dismissedFor: `${prev.prayerName}_${new Date(Date.now() + prev.remainingTime).getTime()}`,
+                        }));
+                      }}
+                      style={{
+                        background: "transparent",
+                        border: "none",
+                        color: "inherit",
+                        opacity: 0.7,
+                        cursor: "pointer",
+                        padding: "4px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      title="Dismiss"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                  </div>
+                )}
 
               <div>
                 {/* Sunrise/Sunset under remaining time */}

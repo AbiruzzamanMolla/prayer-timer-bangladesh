@@ -101,7 +101,9 @@ function startBackgroundTimer() {
         school: 1, // Hanafi
         midnightMode: 0, // Standard
         latitudeAdjustmentMethod: 3, // Angle Based
-        timeFormat: "12hr"
+        timeFormat: "12hr",
+        congregationOffsets: { Fajr: 30, Dhuhr: 15, Asr: 15, Maghrib: 10, Isha: 15 },
+        congregationNotifyBefore: 5
     };
 
     const location = myContext.globalState.get('pt_location') || defaultLocation;
@@ -163,6 +165,30 @@ function cacheNextPrayerLoop(location, settings) {
         }
     }
     lastAnnouncedPrayer = currentPrayerName;
+
+    // -- CONGREGATION NOTIFICATION LOGIC --
+    if (currentPrayerName !== "Sunrise" && settings.congregationOffsets) {
+        const prayerStartTime = parseAdhanTime(timings[currentPrayerName]);
+        // Handle Isha wrap-around if it's past midnight
+        if (currentPrayerName === "Isha" && now < prayerStartTime) {
+             prayerStartTime.setDate(prayerStartTime.getDate() - 1);
+        }
+        
+        const offsetMins = settings.congregationOffsets[currentPrayerName] || 0;
+        const notifyBeforeMins = settings.congregationNotifyBefore || 5;
+        
+        const congregationTime = new Date(prayerStartTime.getTime() + offsetMins * 60000);
+        const notifyTime = new Date(congregationTime.getTime() - notifyBeforeMins * 60000);
+        
+        // If it's time to notify and we haven't already notified for this exact congregation time
+        if (now >= notifyTime && now < congregationTime) {
+            const congregationKey = `${currentPrayerName}_${congregationTime.getTime()}`;
+            if (myContext.globalState.get('lastNotifiedCongregation') !== congregationKey) {
+                vscode.window.showInformationMessage(`Congregation for ${currentPrayerName} will start in ${notifyBeforeMins} minutes.`);
+                myContext.globalState.update('lastNotifiedCongregation', congregationKey);
+            }
+        }
+    }
 
     // --- RAMADAN OVERRIDE ---
     let displayPrayer = currentPrayerName === "Sunrise" ? "Salatud Doha" : currentPrayerName;
