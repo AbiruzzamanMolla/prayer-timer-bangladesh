@@ -1,0 +1,79 @@
+{
+  "name": "prayer-timer-bangladesh",
+  "displayName": "Muslim Prayer Timer",
+  "description": "The Prayer Timer extension provides an easy and convenient way to track prayer times based on your GPS location. With this extension, you can seamlessly integrate prayer time notifications into your Visual Studio Code environment.",
+  "version": "2.0.0",
+  "type": "module",
+  "publisher": "azmolla",
+  "icon": "icon.webp",
+  "engines": {
+    "vscode": "^1.94.0"
+  },
+  "bugs": {
+    "url": "https://github.com/AbiruzzamanMolla/prayer-timer-bangladesh/issues"
+  },
+  "homepage": "https://marketplace.visualstudio.com/items?itemName=azmolla.prayer-timer-bangladesh",
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "prayer",
+    "namaj",
+    "prayer-time",
+    "namaj-type",
+    "salah time",
+    "time",
+    "muslim"
+  ],
+  "main": "./out/extension.cjs",
+  "activationEvents": [
+    "*"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "prayer-time.open",
+        "title": "Open Prayer Time"
+      }
+    ]
+  },
+  "files": [
+    "dist",
+    "out",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "icon.webp"
+  ],
+  "scripts": {
+    "dev": "concurrently \"vite\" \"npm run watch\"",
+    "build": "vite build && npm run build:ext",
+    "build:ext": "esbuild ext-src/extension.js --bundle --external:vscode --format=cjs --platform=node --outfile=out/extension.cjs",
+    "watch": "esbuild ext-src/extension.js --bundle --external:vscode --format=cjs --platform=node --outfile=out/extension.cjs --watch",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.11",
+    "adhan": "^4.4.3",
+    "moment": "^2.30.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-icons": "^5.5.0",
+    "tailwindcss": "^4.1.11"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.30.1",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@types/vscode": "^1.94.0",
+    "@vitejs/plugin-react-swc": "^3.10.2",
+    "concurrently": "^9.2.1",
+    "esbuild": "^0.27.3",
+    "eslint": "^9.30.1",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "vite": "^7.0.4"
+  }
+}
