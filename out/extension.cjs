@@ -1688,7 +1688,9 @@ function startBackgroundTimer() {
     // Standard
     latitudeAdjustmentMethod: 3,
     // Angle Based
-    timeFormat: "12hr"
+    timeFormat: "12hr",
+    congregationOffsets: { Fajr: 30, Dhuhr: 15, Asr: 15, Maghrib: 10, Isha: 15 },
+    congregationNotifyBefore: 5
   };
   const location = myContext.globalState.get("pt_location") || defaultLocation;
   const settings = myContext.globalState.get("pt_settings") || defaultSettings;
@@ -1734,6 +1736,23 @@ function cacheNextPrayerLoop(location, settings) {
     }
   }
   lastAnnouncedPrayer = currentPrayerName;
+  if (currentPrayerName !== "Sunrise" && settings.congregationOffsets) {
+    const prayerStartTime = parseAdhanTime(timings[currentPrayerName]);
+    if (currentPrayerName === "Isha" && now < prayerStartTime) {
+      prayerStartTime.setDate(prayerStartTime.getDate() - 1);
+    }
+    const offsetMins = settings.congregationOffsets[currentPrayerName] || 0;
+    const notifyBeforeMins = settings.congregationNotifyBefore || 5;
+    const congregationTime = new Date(prayerStartTime.getTime() + offsetMins * 6e4);
+    const notifyTime = new Date(congregationTime.getTime() - notifyBeforeMins * 6e4);
+    if (now >= notifyTime && now < congregationTime) {
+      const congregationKey = `${currentPrayerName}_${congregationTime.getTime()}`;
+      if (myContext.globalState.get("lastNotifiedCongregation") !== congregationKey) {
+        vscode.window.showInformationMessage(`Congregation for ${currentPrayerName} will start in ${notifyBeforeMins} minutes.`);
+        myContext.globalState.update("lastNotifiedCongregation", congregationKey);
+      }
+    }
+  }
   let displayPrayer = currentPrayerName === "Sunrise" ? "Salatud Doha" : currentPrayerName;
   if (settings.ramadanMode) {
     const fajrTime = parseAdhanTime(timings["Fajr"]);

@@ -283,28 +283,35 @@ const SettingsModal = ({
           </button>
         </div>
 
-        <div className="settings-tabs">
+        <div
+          className="settings-tabs"
+          style={{ display: "flex", gap: "2px", padding: "4px" }}
+        >
           <button
             className={`tab-button ${activeTab === "appearance" ? "active" : ""}`}
             onClick={() => setActiveTab("appearance")}
+            style={{ padding: "6px 4px", fontSize: "12px" }}
           >
             Appearance
           </button>
           <button
             className={`tab-button ${activeTab === "location" ? "active" : ""}`}
             onClick={() => setActiveTab("location")}
+            style={{ padding: "6px 4px", fontSize: "12px" }}
           >
             Location
           </button>
           <button
             className={`tab-button ${activeTab === "calculation" ? "active" : ""}`}
             onClick={() => setActiveTab("calculation")}
+            style={{ padding: "6px 4px", fontSize: "12px" }}
           >
             Calculation
           </button>
           <button
             className={`tab-button ${activeTab === "congregation" ? "active" : ""}`}
             onClick={() => setActiveTab("congregation")}
+            style={{ padding: "6px 4px", fontSize: "12px" }}
           >
             Congregation
           </button>
