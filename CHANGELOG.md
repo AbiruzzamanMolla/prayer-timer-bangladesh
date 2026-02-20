@@ -5,6 +5,13 @@ All notable changes to the **[Prayer Timer Bangladesh](https://marketplace.visua
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-02-20
+
+### Added
+
+- **Prayer Notifications:** The VS Code native host now continuously tracks schedule boundaries and will fire a `vscode.window.showInformationMessage` alert whenever a new prayer time begins.
+- **Ramadan Alerts:** Added explicit notification hooks for the beginning and end of daily fasting when `ramadanMode` is enabled. You will now be alerted when "Sehri has ended" and "It's time for Iftar".
+
 ## [2.0.0] - 2026-02-20
 
 ### Added

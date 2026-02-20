@@ -8,6 +8,8 @@ import { formatPrayerTime } from '../src/utils/helpers.js';
 let myStatusBarItem;
 let prayerTimerInterval;
 let myContext;
+let lastAnnouncedPrayer = null;
+let lastRamadanState = null;
 
 export function activate(context) {
     myContext = context;
@@ -150,6 +152,18 @@ function cacheNextPrayerLoop(location, settings) {
         }
     }
 
+    // -- NOTIFICATIONS LOGIC --
+    if (lastAnnouncedPrayer && lastAnnouncedPrayer !== currentPrayerName) {
+        if (currentPrayerName === "Sunrise") {
+            vscode.window.showInformationMessage("Fajr time has ended.");
+        } else if (lastAnnouncedPrayer === "Sunrise") {
+            vscode.window.showInformationMessage(`${currentPrayerName} time has started.`);
+        } else {
+            vscode.window.showInformationMessage(`${lastAnnouncedPrayer} time has ended. ${currentPrayerName} time has started.`);
+        }
+    }
+    lastAnnouncedPrayer = currentPrayerName;
+
     // --- RAMADAN OVERRIDE ---
     let displayPrayer = currentPrayerName === "Sunrise" ? "Salatud Doha" : currentPrayerName;
     
@@ -157,7 +171,18 @@ function cacheNextPrayerLoop(location, settings) {
         const fajrTime = parseAdhanTime(timings["Fajr"]);
         const maghribTime = parseAdhanTime(timings["Maghrib"]);
         
-        if (now >= fajrTime && now < maghribTime) {
+        const isFasting = (now >= fajrTime && now < maghribTime);
+
+        if (lastRamadanState !== null && lastRamadanState !== isFasting) {
+            if (isFasting) {
+                vscode.window.showInformationMessage("Sehri time has ended! Fasting has begun.");
+            } else {
+                vscode.window.showInformationMessage("It's time for Iftar! Fasting has ended.");
+            }
+        }
+        lastRamadanState = isFasting;
+
+        if (isFasting) {
             // Fasting (Day)
             displayPrayer = "Iftar";
             targetDate = maghribTime;
